@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -10,7 +11,12 @@ public class MenuFunctions : MonoBehaviour
     public Slider fovSlider, sensivitySlider;
 
     public static bool isGamePaused;
-    private bool autoReload = true;
+    public static bool AutoReload { get; private set; } = true;
+    public static bool FpsCheck { get; private set; } = true;
+    public static int HoldToSprint { get; private set; } = 0;
+    public static int HoldToCrouch { get; private set; } = 0;
+
+    public static Action fpsCheckEvent;
 
     void Start()
     {
@@ -88,10 +94,24 @@ public class MenuFunctions : MonoBehaviour
 
     public void ReadAutoReload(bool value)
     {
-        autoReload = value;
+        AutoReload = value;
     }
 
-    public bool AutoReload { get => autoReload; }
+    public void ReadFpsCheck(bool value)
+    {
+        FpsCheck = value;
+        fpsCheckEvent?.Invoke();
+    }
+
+    public void ReadHoldToSprint(int value)
+    {
+        HoldToSprint = value;
+    }
+
+    public void ReadHoldToCrouch(int value)
+    {
+        HoldToCrouch = value;
+    }
 
     public void ExtiGame()
     {

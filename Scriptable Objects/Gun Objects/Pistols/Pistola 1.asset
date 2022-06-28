@@ -10,18 +10,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e274c25beefee9d4987ac75d5dcc2e48, type: 3}
-  m_Name: Plasma Pump
+  m_Name: Pistola 1
   m_EditorClassIdentifier: 
-  name: Plasma Pump
-  weight: 80
-  damage: 300
+  name: M1911
+  weight: 95
+  damage: 20
   maxDistance: 50
   isAuto: 0
-  magAmmo: 2
-  magSize: 6
-  reserveAmmo: 60
-  reserveSize: 60
-  fireRate: 92
-  reloadTime: 5
+  magAmmo: 8
+  magSize: 8
+  reserveAmmo: 80
+  reserveSize: 80
+  fireRate: 625
+  reloadTime: 1.2
   reloading: 0
   inspecting: 0

@@ -29,6 +29,7 @@ public class GunData : ScriptableObject, IData
 
     public string Name => name;
     public float Weight => weight;
+    public bool Reloading => reloading;
     public float MagAmmo => magAmmo;
     public float ReserveAmmo => reserveAmmo;
 }

@@ -10,8 +10,5 @@ public class RoundCounter : MonoBehaviour
         EnemySpawn.roundSwitch += UpdateText;
     }
 
-    private void UpdateText()
-    {
-        round.text = (EnemySpawn.nextRound + 1).ToString();
-    }
+    private void UpdateText() => round.text = (EnemySpawn.nextRound + 1).ToString();
 }

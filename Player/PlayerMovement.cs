@@ -39,8 +39,9 @@ public class PlayerMovement : MonoBehaviour
     private bool isJumping;
     [HideInInspector] public bool isWalking;
     [HideInInspector] public bool isSprinting;
-    private bool justSprinted, stoppedSprinting;
-    private bool isCrouching, justCrouched, stoppedCrouching;
+    [HideInInspector] public bool isCrouching;
+    private bool isCurrentlySprinting, justSprinted, stoppedSprinting;
+    private bool isCurrentlyCrouching, justCrouched, stoppedCrouching;
     private bool isSliding;
     private bool hasJumped;
     private bool hasLedged;
@@ -58,18 +59,22 @@ public class PlayerMovement : MonoBehaviour
     private Coroutine changeFov;
     private Coroutine changeScale;
 
+    private IData gunData;
+
     private void Start()
     {
         transform.localScale = walkScale;
         currentSpeed = walkSpeed;
         camera.fieldOfView = fov;
+
+        gunData = Shooting.GetData();
+        Shooting.weaponSwitchInput += () => gunData = Shooting.GetData();
+        Shooting.semiShootInput += StopSprint;
+        Shooting.autoShootInput += StopSprint;
     }
 
     private void Update()
     {
-        //Getting the active gun's data
-        IData gunData = Shooting.GetData();
-
         //Checking if the player is touching the ground
         isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
 
@@ -94,28 +99,27 @@ public class PlayerMovement : MonoBehaviour
     private void Inputs()
     {
         //Bool for walking
-        isWalking = (z > 0.5 || z < -0.5) && !isSprinting;
+        isWalking = (z > 0.5 || z < -0.5 || x > 0.5 || x < -0.5) && !isSprinting;
 
         //Input for jumping
         isJumping = Input.GetButtonDown("Jump");
 
-        //Input for sprinting
-        isSprinting = Input.GetButton("Sprint");
+        //Checking if sprinting every frame
+        if (!gunData.Reloading)
+            isCurrentlySprinting = Input.GetButton("Sprint");
         //Input for starting sprinting
-        justSprinted = Input.GetButtonDown("Sprint");
+        if (!gunData.Reloading)
+            justSprinted = Input.GetButtonDown("Sprint");
         //Input for stopping sprinting
-        stoppedSprinting = Input.GetButtonUp("Sprint");
+        if (!gunData.Reloading)
+            stoppedSprinting = Input.GetButtonUp("Sprint");
 
         //Input for crouching
-        isCrouching = Input.GetButton("Crouch");
+        isCurrentlyCrouching = Input.GetButton("Crouch");
         //Input for starting crouching
         justCrouched = Input.GetButtonDown("Crouch");
         //Input for stopping crouching
         stoppedCrouching = Input.GetButtonUp("Crouch");
-
-        //Setting the slide check
-        if (isCrouching && isGrounded && currentSpeed == walkSpeed * sprintSpeedMultiplier)
-            isSliding = true;
     }
 
     private void Gravity()
@@ -136,81 +140,156 @@ public class PlayerMovement : MonoBehaviour
         }
 
         if (isGrounded && hasJumped && velocity.y < 0) hasJumped = false;
+
+        if (hasJumped && isCrouching) StopCrouch();
+        if (hasJumped && isSliding) isSliding = false;
     }
 
     private void Sprint()
     {
-        if (isGrounded && !isCrouching && z > 0)
+        if (isGrounded && !isCurrentlyCrouching && z > 0 && !gunData.Reloading)
         {
-            if (justSprinted)
+            if (MenuFunctions.HoldToSprint == 0)
             {
-                isWalking = false;
-                ChangeSpeed(sprintSpeedMultiplier);
-                if (isChangingFov) StopCoroutine(changeFov);
-                changeFov = StartCoroutine(ChangeFov(fov * sprintFovMultiplier));
+                if (!isSprinting && justSprinted)
+                {
+                    StartSprint();
+                    return;
+                }
+
+                if (isSprinting && justSprinted)
+                {
+                    StopSprint();
+                    return;
+                }
+            }
+            else if (MenuFunctions.HoldToSprint == 1)
+            {
+                if (isCurrentlySprinting)
+                {
+                    StartSprint();
+                    return;
+                }
+
+                if (stoppedSprinting)
+                {
+                    StopSprint();
+                    return;
+                }
             }
         }
 
-        if (stoppedSprinting && !isCrouching && z > 0)
+        //Prevents you to sprint while going backwards
+        if (isSprinting && !isCurrentlyCrouching && z <= 0 && isGrounded)
         {
-            isWalking = true;
-            ChangeSpeed();
-            if (isChangingFov) StopCoroutine(changeFov);
-            changeFov = StartCoroutine(ChangeFov(fov));
+            StopSprint();
         }
 
-        //Prevents you to sprint while going backwards
-        if (isSprinting && !isCrouching && z <= 0 && isGrounded)
+        //Stops you from sprinting while reloading
+        if (isSprinting && gunData.Reloading)
         {
-            ChangeSpeed();
-            isSprinting = false;
-            if (isChangingFov) StopCoroutine(changeFov);
-            changeFov = StartCoroutine(ChangeFov(fov));
+            StopSprint();
         }
+    }
+
+    private void StartSprint()
+    {
+        isSprinting = true;
+        isWalking = false;
+        ChangeSpeed(sprintSpeedMultiplier);
+        if (isChangingFov) StopCoroutine(changeFov);
+        changeFov = StartCoroutine(ChangeFov(fov * sprintFovMultiplier));
+    }
+
+    private void StopSprint()
+    {
+        isWalking = true;
+        isSprinting = false;
+        ChangeSpeed();
+        if (isChangingFov) StopCoroutine(changeFov);
+        changeFov = StartCoroutine(ChangeFov(fov));
     }
 
     private void Crouch()
     {
-        if (justCrouched)
+        if (MenuFunctions.HoldToCrouch == 0)
         {
+            if (justCrouched && !isCrouching)
+            {
+                StartCrouch();
+                return;
+            }
 
-            //Setting the crouch speed
-            if (!isSprinting)
-                ChangeSpeed(crouchSpeedMultiplier);
-
-            //Changing the size of the player and teleporting it
-            crouchTpPosition = new Vector3(
-                transform.position.x + currentSpeed * move.x / 10, 
-                transform.position.y - (walkScale.y - crouchScale.y), 
-                transform.position.z + currentSpeed * move.z / 10
-                );
-            if (isChangingScale) StopCoroutine(changeScale);
-            changeScale = StartCoroutine(ScalePlayer(crouchScale, crouchTpPosition));
+            if (stoppedCrouching && isCrouching)
+            {
+                StopCrouch();
+                return;
+            }
         }
-
-        if (stoppedCrouching)
+        else if (MenuFunctions.HoldToCrouch == 1)
         {
-            //Setting the walkSpeed and changing the fov
-            if (isGrounded)
+            if (justCrouched && !isCrouching)
+            {
+                StartCrouch();
+                return;
+            }
+
+            if (justCrouched && isCrouching)
+            {
+                StopCrouch();
+                return;
+            }
+        }
+    }
+    
+    private void StartCrouch()
+    {
+        isCrouching = true;
+
+        //Setting the crouch speed
+        if (!isSprinting)
+            ChangeSpeed(crouchSpeedMultiplier);
+
+        //Changing the size of the player and teleporting it
+        crouchTpPosition = new Vector3(
+            transform.position.x + currentSpeed * move.x / 10,
+            transform.position.y - (walkScale.y - crouchScale.y),
+            transform.position.z + currentSpeed * move.z / 10
+            );
+        if (isChangingScale) StopCoroutine(changeScale);
+        changeScale = StartCoroutine(ScalePlayer(crouchScale, crouchTpPosition));
+    }
+
+    private void StopCrouch()
+    {
+        isCrouching = false;
+
+        //Setting the walkSpeed and changing the fov
+        if (isGrounded)
+        {
+            if (isSprinting)
+            {
+                isSprinting = true;
+                ChangeSpeed(sprintSpeedMultiplier);
+                if (isChangingFov) StopCoroutine(changeFov);
+                changeFov = StartCoroutine(ChangeFov(fov * sprintFovMultiplier));
+            }
+            else
             {
                 ChangeSpeed();
                 if (isChangingFov) StopCoroutine(changeFov);
                 changeFov = StartCoroutine(ChangeFov(fov));
             }
-
-            //Resetting the sliding check
-            if (isSliding)
-                isSliding = false;
-
-            //Changing the size of the player and teleporting it
-            walkTpPosition = new Vector3(
-                transform.position.x + currentSpeed * move.x / 10, 
-                transform.position.y + (walkScale.y - crouchScale.y), 
-                transform.position.z + currentSpeed * move.z / 10
-                );
-            if (isChangingScale) StopCoroutine(changeScale);
-            changeScale = StartCoroutine(ScalePlayer(walkScale, walkTpPosition));
         }
+
+        //Changing the size of the player and teleporting it
+        walkTpPosition = new Vector3(
+            transform.position.x + currentSpeed * move.x / 10,
+            transform.position.y + (walkScale.y - crouchScale.y),
+            transform.position.z + currentSpeed * move.z / 10
+            );
+        if (isChangingScale) StopCoroutine(changeScale);
+        changeScale = StartCoroutine(ScalePlayer(walkScale, walkTpPosition));
     }
 
     private void Slide()
@@ -218,18 +297,19 @@ public class PlayerMovement : MonoBehaviour
         //Changing speed and fov
         if (isGrounded && justCrouched && isSprinting)
         {
+            isSliding = true;
             ChangeSpeed(slideForce);
             if (isChangingFov) StopCoroutine(changeFov);
             changeFov = StartCoroutine(ChangeFov(fov * slideFovMultiplier));
         }
 
-        //Slowing down sliding
+        //Slowing down while sliding
         if (isSliding && currentSpeed > walkSpeed * crouchSpeedMultiplier)
         {
             if (isGrounded)
-                currentSpeed -= currentSpeed * slideCounterForce;
+                currentSpeed *= slideCounterForce;
             else
-                currentSpeed -= currentSpeed * slideAirCounterForce;
+                currentSpeed *= slideAirCounterForce;
         }
         else if (isSliding && currentSpeed < walkSpeed * crouchSpeedMultiplier)
         {
@@ -240,19 +320,50 @@ public class PlayerMovement : MonoBehaviour
         }
 
         //Resetting the speed and fov
-        if (stoppedCrouching && isSprinting)
+        if (MenuFunctions.HoldToCrouch == 1)
+            if (stoppedCrouching)
+            {
+                isSliding = false;
+
+                if (!isGrounded)
+                {
+                    StartCoroutine(StopSlide());
+                }
+                else
+                {
+                    if (isSprinting)
+                    {
+                        ChangeSpeed(sprintSpeedMultiplier);
+                        if (isChangingFov) StopCoroutine(changeFov);
+                        changeFov = StartCoroutine(ChangeFov(fov * sprintFovMultiplier));
+                    }
+                    else
+                    {
+                        ChangeSpeed();
+                        if (isChangingFov) StopCoroutine(changeFov);
+                        changeFov = StartCoroutine(ChangeFov(fov));
+                    }
+                }
+        }
+    }
+
+    private IEnumerator StopSlide()
+    {
+        yield return new WaitUntil(() => isGrounded);
+        isSliding = false;
+
+        if (isSprinting)
         {
             ChangeSpeed(sprintSpeedMultiplier);
             if (isChangingFov) StopCoroutine(changeFov);
             changeFov = StartCoroutine(ChangeFov(fov * sprintFovMultiplier));
         }
-        else if (stoppedCrouching && !isSprinting)
+        else
         {
             ChangeSpeed();
             if (isChangingFov) StopCoroutine(changeFov);
             changeFov = StartCoroutine(ChangeFov(fov));
         }
-
     }
 
     private void LedgeGrab()
@@ -264,14 +375,20 @@ public class PlayerMovement : MonoBehaviour
             bool ray = Physics.Raycast(transform.position + rayOffset + transform.forward * rayDistance, Vector3.down, rayLength, groundMask);
 
             if (!hasLedged && ray)
-            {
-                velocity.y = Mathf.Sqrt(ledgeJumpHeight * -2 * gravity);
-                currentSpeed /= 2;
-                hasLedged = true;
-            }
+                StartCoroutine(Ledging());
         }
-        
-        if (isGrounded && velocity.y < 0) hasLedged = false;
+    }
+
+    private IEnumerator Ledging()
+    {
+        velocity.y = Mathf.Sqrt(ledgeJumpHeight * -2 * gravity);
+        currentSpeed /= 2;
+        hasLedged = true;
+
+        yield return new WaitUntil(() => isGrounded);
+
+        currentSpeed = isSprinting ? walkSpeed * sprintSpeedMultiplier : walkSpeed;
+        hasLedged = false;
     }
 
     private IEnumerator ScalePlayer(Vector3 newScale, Vector3 newPosition)

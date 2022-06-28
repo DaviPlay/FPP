@@ -9,6 +9,7 @@ public class Shooting : MonoBehaviour
     public static Action autoShootInput;
     public static Action reloadInput;
     public static Action inspectInput;
+    public static Action weaponSwitchInput;
 
     public static Action updateText;
 
@@ -36,7 +37,7 @@ public class Shooting : MonoBehaviour
             autoShootInput?.Invoke();
             updateText?.Invoke();
         }
-        
+
         if (Input.GetButtonDown("Fire1"))
         {
             semiShootInput?.Invoke();
@@ -93,6 +94,7 @@ public class Shooting : MonoBehaviour
                         gun.gameObject.SetActive(true);
                         weapon = gun.gameObject.GetComponent<Gun>() != null ? gun.gameObject.GetComponent<Gun>() : gun.gameObject.GetComponent<Melee>();
                         data = weapon is Gun ? gun.gameObject.GetComponent<Gun>().GetData() : gun.gameObject.GetComponent<Melee>().GetData();
+                        weaponSwitchInput?.Invoke();
                     }
                     else
                         gun.gameObject.SetActive(false);

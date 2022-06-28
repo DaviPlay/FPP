@@ -14,10 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   name: Arms
   weight: 100
-  damage: 100
+  damage: 150
   maxDistance: 5
   fireRate: 100
-  attackDelay: 15
+  attackDelay: 200
   attacking: 0
   magAmmo: -1
   reserveAmmo: -1

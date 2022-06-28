@@ -49,7 +49,6 @@ public class Melee : MonoBehaviour, IWeapon
 
         if (CanAttack())
         {
-
             timeSinceLastAttack = 0;
             if (gameObject.activeSelf)
                 attack = StartCoroutine(OnAttack());
@@ -80,12 +79,13 @@ public class Melee : MonoBehaviour, IWeapon
         if (!gameObject.activeSelf) return;
 
         inspect = StartCoroutine(Inspect());
-        anim.SetBool("Inspected", true);
     }
 
     public IEnumerator Inspect()
     {
         data.inspecting = true;
+        anim.SetBool("Inspected", true);
+        anim.SetInteger("Inspect Index", Random.Range(0, 5));
 
         yield return new WaitForEndOfFrame();
 

@@ -129,8 +129,7 @@ public class EnemySpawn : MonoBehaviour
     public void SpawnEnemy(Transform _enemy)
     {
         Transform _sp = spawnPoints[UnityEngine.Random.Range(0, spawnPoints.Length - 1)];
-        EnemyHealth _eh = _enemy.GetComponent<EnemyHealth>();
-        _eh.SetMaxHealth(enemyHealth);
+        _enemy.GetComponent<EnemyHealth>().SetMaxHealth(enemyHealth);
 
         Instantiate(_enemy, _sp);
     }

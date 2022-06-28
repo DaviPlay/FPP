@@ -23,6 +23,7 @@ public class MeleeData : ScriptableObject, IData
 
     public string Name => name;
     public float Weight => weight;
+    public bool Reloading => false;
     public float MagAmmo => magAmmo;
     public float ReserveAmmo => reserveAmmo;
 }

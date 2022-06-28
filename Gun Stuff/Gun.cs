@@ -5,6 +5,7 @@ public class Gun : MonoBehaviour, IWeapon
 {
     [Header("References")]
     [SerializeField] GunData data;
+    [SerializeField] Transform player;
     [SerializeField] LayerMask enemyMask;
     private Transform eyes;
 
@@ -46,6 +47,9 @@ public class Gun : MonoBehaviour, IWeapon
     private void Update()
     {
         timeSinceLastShot += Time.deltaTime;
+
+        anim.SetBool("Walking", player.GetComponent<PlayerMovement>().isWalking);
+        anim.SetBool("Sprinting", player.GetComponent<PlayerMovement>().isSprinting);
     }
 
     public void Shoot()
@@ -65,6 +69,10 @@ public class Gun : MonoBehaviour, IWeapon
             timeSinceLastShot = 0;
             if (gameObject.activeSelf)
                 shoot = StartCoroutine(OnGunShot());
+        }
+        else if (data.magAmmo <= 0 && MenuFunctions.AutoReload)
+        {
+            StartReload();
         }
     }
 
@@ -95,9 +103,6 @@ public class Gun : MonoBehaviour, IWeapon
 
         yield return new WaitForSeconds(data.reloadTime);
 
-        anim.ResetTrigger("Reloading");
-        data.reloading = false;
-
         if (data.reserveAmmo == 0) yield return null;
 
         if (data.magAmmo + data.reserveAmmo < data.magSize)
@@ -113,6 +118,9 @@ public class Gun : MonoBehaviour, IWeapon
 
         if (data.reserveAmmo < 0) data.reserveAmmo = 0;
         if (data.magAmmo < 0) data.magAmmo = 0;
+
+        anim.ResetTrigger("Reloading");
+        data.reloading = false;
     }
 
     public void StartInspect()
@@ -122,12 +130,12 @@ public class Gun : MonoBehaviour, IWeapon
         if (data.reloading) return;
 
         inspect = StartCoroutine(Inspect());
-        anim.SetBool("Inspected", true);
     }
 
     public IEnumerator Inspect()
     {
         data.inspecting = true;
+        anim.SetBool("Inspected", true);
 
         yield return new WaitForEndOfFrame();
 

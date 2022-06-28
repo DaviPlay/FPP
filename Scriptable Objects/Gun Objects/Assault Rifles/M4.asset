@@ -13,14 +13,15 @@ MonoBehaviour:
   m_Name: M4
   m_EditorClassIdentifier: 
   name: M4
-  weight: 95
+  weight: 90
   damage: 150
   maxDistance: 100
   isAuto: 1
-  magAmmo: 24
+  magAmmo: 30
   magSize: 30
   reserveAmmo: 150
   reserveSize: 150
   fireRate: 500
   reloadTime: 1.6
   reloading: 0
+  inspecting: 0
