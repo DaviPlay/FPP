@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
@@ -23,8 +24,13 @@ public class EnemyAI : MonoBehaviour
     void Update()
     {
         Attack();
-
-        transform.gameObject.GetComponent<NavMeshAgent>().SetDestination(playerTransform.position);
+        try
+        {
+            transform.gameObject.GetComponent<NavMeshAgent>().SetDestination(playerTransform.position);
+        }
+        catch (Exception)
+        {
+        }
     }
 
     private void Attack()

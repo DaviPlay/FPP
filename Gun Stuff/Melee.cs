@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -30,8 +31,14 @@ public class Melee : MonoBehaviour, IWeapon
 
         Shooting.semiShootInput += Attack;
         Shooting.inspectInput += StartInspect;
-
-        anim = GetComponent<Animator>();
+        
+        try
+        {
+            anim = GetComponent<Animator>();
+        }
+        catch (Exception)
+        {
+        }
     }
 
     private void Update()
@@ -85,7 +92,7 @@ public class Melee : MonoBehaviour, IWeapon
     {
         data.inspecting = true;
         anim.SetBool("Inspected", true);
-        anim.SetInteger("Inspect Index", Random.Range(0, 5));
+        anim.SetInteger("Inspect Index", UnityEngine.Random.Range(0, 5));
 
         yield return new WaitForEndOfFrame();
 

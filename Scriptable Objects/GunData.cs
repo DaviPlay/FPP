@@ -15,21 +15,14 @@ public class GunData : ScriptableObject, IData
     public bool isAuto;
 
     [Header("Reloading")]
-    public int magAmmo;
-    public int magSize;
-    public int reserveAmmo;
-    public int reserveSize;
-    [Tooltip("Rounds Per Minute")]
-    public float fireRate;
-    [Tooltip("In Seconds")]
-    public float reloadTime;
-    [HideInInspector]
-    public bool reloading;
+    public AmmoType ammoType;
+    [HideInInspector] public int ammo = 0;
+    [Tooltip("Rounds Per Minute")] public float fireRate;
+    [Tooltip("In Seconds")] public float reloadTime;
     [HideInInspector] public bool inspecting;
 
     public string Name => name;
     public float Weight => weight;
-    public bool Reloading => reloading;
-    public float MagAmmo => magAmmo;
-    public float ReserveAmmo => reserveAmmo;
+    public AmmoType AmmoType => ammoType;
+    public int Ammo => ammo;
 }

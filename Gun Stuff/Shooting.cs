@@ -78,8 +78,6 @@ public class Shooting : MonoBehaviour
 
         if (previousWeapon != selectedWeapon)
             SelectWeapon();
-
-        updateText?.Invoke();
     }
 
     public void SelectWeapon()
@@ -101,6 +99,8 @@ public class Shooting : MonoBehaviour
 
                     i++;
                 }
+
+        updateText?.Invoke();
     }
 
     public static IData GetData()

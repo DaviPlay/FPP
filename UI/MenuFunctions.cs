@@ -11,7 +11,6 @@ public class MenuFunctions : MonoBehaviour
     public Slider fovSlider, sensivitySlider;
 
     public static bool isGamePaused;
-    public static bool AutoReload { get; private set; } = true;
     public static bool FpsCheck { get; private set; } = true;
     public static int HoldToSprint { get; private set; } = 0;
     public static int HoldToCrouch { get; private set; } = 0;
@@ -31,12 +30,10 @@ public class MenuFunctions : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            //Enable menu
             if (!isGamePaused)
             {
                 Pause();
             }
-            //Disable menu
             else
             {
                 Resume();
@@ -90,11 +87,6 @@ public class MenuFunctions : MonoBehaviour
     {
         camera.GetComponent<CameraMovement>().mouseSensivity = float.Parse(newSensivity);
         sensivitySlider.value = float.Parse(newSensivity);
-    }
-
-    public void ReadAutoReload(bool value)
-    {
-        AutoReload = value;
     }
 
     public void ReadFpsCheck(bool value)

@@ -17,13 +17,10 @@ public class MeleeData : ScriptableObject, IData
     [Tooltip("How many milliseconds after the key is pressed for the attack to happen\n\nSync with animation")]
     public float attackDelay;
     [HideInInspector] public bool attacking;
-    [HideInInspector] public int magAmmo = -1;
-    [HideInInspector] public int reserveAmmo = -1;
     [HideInInspector] public bool inspecting;
 
     public string Name => name;
     public float Weight => weight;
-    public bool Reloading => false;
-    public float MagAmmo => magAmmo;
-    public float ReserveAmmo => reserveAmmo;
+    public AmmoType AmmoType => AmmoType.NONE;
+    public int Ammo => 0;
 }
