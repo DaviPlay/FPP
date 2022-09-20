@@ -9,7 +9,7 @@ public class HealthBar : MonoBehaviour
 
     public PlayerHealth player;
 
-    void Start()
+    private void Start()
     {
         slider.minValue = 0;
         slider.maxValue = player.GetMaxHealth();

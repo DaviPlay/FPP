@@ -5,102 +5,107 @@ using UnityEngine;
 public class Melee : MonoBehaviour, IWeapon
 {
     [Header("References")]
-    [SerializeField] MeleeData data;
-    [SerializeField] Transform player;
-    [SerializeField] LayerMask enemyMask;
-    private Transform eyes;
+    [SerializeField] private MeleeData data;
+    private Transform _player;
+    private LayerMask _enemyMask;
+    private Transform _eyes;
 
     [Header("Blood")]
     public GameObject blood;
-    private const float bloodDuration = 1;
+    [SerializeField] private float bloodDuration = 1;
 
-    private Animator anim;
-    private float timeSinceLastAttack;
+    private Animator _anim;
+    private float _timeSinceLastAttack;
 
-    Coroutine attack;
-    Coroutine inspect;
+    private Coroutine _attack;
+    private Coroutine _inspect;
+    
+    private static readonly int Walking = Animator.StringToHash("Walking");
+    private static readonly int Sprinting = Animator.StringToHash("Sprinting");
+    private static readonly int Attacked = Animator.StringToHash("Attacked");
+    private static readonly int Inspected = Animator.StringToHash("Inspected");
+    private static readonly int InspectIndex = Animator.StringToHash("Inspect Index");
 
-    private bool CanAttack() => !data.attacking && timeSinceLastAttack > 1 / (data.fireRate / 60);
+    private bool CanAttack() => !data.Attacking && _timeSinceLastAttack > 1 / (data.FireRate / 60);
 
     private void Start()
     {
-        eyes = Camera.main.transform;
+        _player = transform.parent.parent.parent.parent.parent.GetChild(0).transform;
+        _enemyMask = LayerMask.GetMask("Enemy");
+        _eyes = Camera.main!.transform;
 
-        data.attacking = false;
-        data.inspecting = false;
+        data.Attacking = false;
+        data.Inspecting = false;
 
-        Shooting.semiShootInput += Attack;
-        Shooting.inspectInput += StartInspect;
+        Shooting.MeleeAttackInput += Attack;
+        Shooting.InspectInput += StartInspect;
         
         try
         {
-            anim = GetComponent<Animator>();
+            _anim = GetComponent<Animator>();
         }
         catch (Exception)
         {
+            // ignored
         }
     }
 
     private void Update()
     {
-        timeSinceLastAttack += Time.deltaTime;
+        _timeSinceLastAttack += Time.deltaTime;
 
-        anim.SetBool("Walking", player.GetComponent<PlayerMovement>().isWalking);
-        anim.SetBool("Sprinting", player.GetComponent<PlayerMovement>().isSprinting);
+        _anim.SetBool(Walking, _player.GetComponent<PlayerMovement>().isWalking);
+        _anim.SetBool(Sprinting, _player.GetComponent<PlayerMovement>().isSprinting);
     }
 
-    public void Attack()
+    private void Attack()
     {
-        if (MenuFunctions.isGamePaused) return;
-        if (!gameObject.activeSelf) return;
-
-        if (CanAttack())
-        {
-            timeSinceLastAttack = 0;
-            if (gameObject.activeSelf)
-                attack = StartCoroutine(OnAttack());
-        }
+        if (MenuFunctions.IsGamePaused || !gameObject.activeSelf) return;
+        if (!CanAttack()) return;
+        
+        _timeSinceLastAttack = 0;
+        _attack = StartCoroutine(OnAttack());
     }
 
     private IEnumerator OnAttack()
     {
-        anim.SetBool("Attacked", true);
+        _anim.SetBool(Attacked, true);
 
-        yield return new WaitForSeconds(data.attackDelay / 1000);
+        yield return new WaitForSeconds(data.AttackDelay / 1000);
 
-        if (Physics.Raycast(eyes.position, eyes.forward, out RaycastHit hit, data.maxDistance, enemyMask))
+        if (Physics.Raycast(_eyes.position, _eyes.forward, out RaycastHit hit, data.MaxDistance, _enemyMask))
         {
             IDamageable damageable = hit.transform.GetComponent<IDamageable>();
-            damageable?.Damage(data.damage);
+            damageable?.Damage(data.Damage);
 
             GameObject go = Instantiate(blood, hit.point, Quaternion.identity, hit.transform);
             Destroy(go, bloodDuration);
         }
 
-        anim.ResetTrigger("Attacked");
+        _anim.ResetTrigger(Attacked);
     }
 
-    public void StartInspect()
+    private void StartInspect()
     {
-        if (MenuFunctions.isGamePaused) return;
+        if (MenuFunctions.IsGamePaused) return;
         if (!gameObject.activeSelf) return;
 
-        inspect = StartCoroutine(Inspect());
+        _inspect = StartCoroutine(Inspect());
     }
 
-    public IEnumerator Inspect()
+    private IEnumerator Inspect()
     {
-        data.inspecting = true;
-        anim.SetBool("Inspected", true);
-        anim.SetInteger("Inspect Index", UnityEngine.Random.Range(0, 5));
+        data.Inspecting = true;
+        _anim.SetBool(Inspected, true);
+        _anim.SetInteger(InspectIndex, UnityEngine.Random.Range(0, 5));
 
         yield return new WaitForEndOfFrame();
 
-        anim.ResetTrigger("Inspected");
-        data.inspecting = false;
+        _anim.ResetTrigger(Inspected);
+        data.Inspecting = false;
     }
 
-    public IData GetData()
+    public IWeaponData GetData()
     {
         return data;
     }

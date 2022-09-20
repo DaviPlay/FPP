@@ -9,15 +9,20 @@ public class GunInfo : MonoBehaviour
 
     private void Start()
     {
-        Shooting.updateText += UpdateText;
+        Shooting.UpdateText += UpdateText;
+        IWeaponData weaponData = Shooting.GetData();
+
+        gunName.text = weaponData.Name;
+        maxAmmo.text = weaponData.Ammo.ToString();
+        ammo.text = weaponData.MagAmmo.ToString();
     }
 
     private void UpdateText()
     {
-        IData gunData = Shooting.GetData();
+        IWeaponData weaponData = Shooting.GetData();
 
-        gunName.text = gunData.Name;
-        maxAmmo.text = gunData.AmmoType.GetMaxAmmo().ToString();
-        ammo.text = gunData.Ammo.ToString();
+        gunName.text = weaponData.Name;
+        maxAmmo.text = weaponData.Ammo.ToString();
+        ammo.text = weaponData.MagAmmo.ToString();
     }
 }

@@ -7,38 +7,35 @@ public class MenuFunctions : MonoBehaviour
     public GameObject menu;
     public GameObject player;
     public GameObject guns;
-    public new Camera camera;
-    public Slider fovSlider, sensivitySlider;
+    public Camera camera;
+    public Slider fovSlider, sensitivitySlider;
 
-    public static bool isGamePaused;
+    public static bool IsGamePaused;
+    public static bool IsAutoReload { get; private set; } = true;
     public static bool FpsCheck { get; private set; } = true;
-    public static int HoldToSprint { get; private set; } = 0;
-    public static int HoldToCrouch { get; private set; } = 0;
+    public static int HoldToSprint { get; private set; }
+    public static int HoldToCrouch { get; private set; }
 
-    public static Action fpsCheckEvent;
+    public static Action AutoReloadEvent;
+    public static Action FPSCheckEvent;
 
-    void Start()
+    private void Start()
     {
         fovSlider.value = camera.fieldOfView;
         fovSlider.GetComponentInChildren<InputField>().text = camera.fieldOfView.ToString();
 
-        sensivitySlider.value = camera.GetComponent<CameraMovement>().mouseSensivity;
-        sensivitySlider.GetComponentInChildren<InputField>().text = camera.GetComponent<CameraMovement>().mouseSensivity.ToString();
+        sensitivitySlider.value = camera.GetComponent<CameraMovement>().mouseSensitivity;
+        sensitivitySlider.GetComponentInChildren<InputField>().text = camera.GetComponent<CameraMovement>().mouseSensitivity.ToString();
     }
 
-    void Update()
+    private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            if (!isGamePaused)
-            {
-                Pause();
-            }
-            else
-            {
-                Resume();
-            }
-        }
+        if (!Input.GetKeyDown(KeyCode.Escape)) return;
+        
+        if (!IsGamePaused)
+            Pause();
+        else
+            Resume();
     }
 
     private void Pause()
@@ -49,7 +46,7 @@ public class MenuFunctions : MonoBehaviour
 
         Time.timeScale = 0;
 
-        isGamePaused = true;
+        IsGamePaused = true;
     }
 
     private void Resume()
@@ -60,7 +57,7 @@ public class MenuFunctions : MonoBehaviour
 
         Time.timeScale = 1;
 
-        isGamePaused = false;
+        IsGamePaused = false;
     }
 
     public void FovSlider(float newFov)
@@ -77,22 +74,28 @@ public class MenuFunctions : MonoBehaviour
         fovSlider.value = float.Parse(newFov);
     }
 
-    public void SensivitySlider(float newSensivity)
+    public void SensitivitySlider(float newSensitivity)
     {
-        camera.GetComponent<CameraMovement>().mouseSensivity = newSensivity;
-        sensivitySlider.GetComponentInChildren<InputField>().text = newSensivity.ToString();
+        camera.GetComponent<CameraMovement>().mouseSensitivity = newSensitivity;
+        sensitivitySlider.GetComponentInChildren<InputField>().text = newSensitivity.ToString();
     }
 
-    public void SensivityInput(string newSensivity)
+    public void SensitivityInput(string newSensitivity)
     {
-        camera.GetComponent<CameraMovement>().mouseSensivity = float.Parse(newSensivity);
-        sensivitySlider.value = float.Parse(newSensivity);
+        camera.GetComponent<CameraMovement>().mouseSensitivity = float.Parse(newSensitivity);
+        sensitivitySlider.value = float.Parse(newSensitivity);
+    }
+
+    public void AutoReloadCheck(bool value)
+    {
+        IsAutoReload = value;
+        AutoReloadEvent?.Invoke();
     }
 
     public void ReadFpsCheck(bool value)
     {
         FpsCheck = value;
-        fpsCheckEvent?.Invoke();
+        FPSCheckEvent?.Invoke();
     }
 
     public void ReadHoldToSprint(int value)
@@ -105,7 +108,7 @@ public class MenuFunctions : MonoBehaviour
         HoldToCrouch = value;
     }
 
-    public void ExtiGame()
+    public void ExitGame()
     {
         Application.Quit();
     }

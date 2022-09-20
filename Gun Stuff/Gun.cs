@@ -5,115 +5,158 @@ using UnityEngine;
 public class Gun : MonoBehaviour, IWeapon
 {
     [Header("References")]
-    [SerializeField] GunData data;
-    [SerializeField] Transform player;
-    [SerializeField] LayerMask enemyMask;
-    private Transform eyes;
+    [SerializeField] private GunData data;
+    private Transform _player;
+    private LayerMask _enemyMask;
+    private Transform _eyes;
 
     [Header("Blood")]
     public GameObject blood;
-    private const float bloodDuration = 1;
+    [SerializeField] private float bloodDuration = 1;
 
-    private Animator anim;
-    private float timeSinceLastShot;
-    private RaycastHit hit;
+    private Animator _anim;
+    private float _timeSinceLastShot;
 
-    Coroutine shoot;
-    Coroutine reload;
-    Coroutine inspect;
+    private Coroutine _shoot;
+    private Coroutine _reload;
+    private Coroutine _inspect; 
+    
+    private static readonly int Walking = Animator.StringToHash("Walking");
+    private static readonly int Sprinting = Animator.StringToHash("Sprinting");
+    private static readonly int Shot = Animator.StringToHash("Shot");
+    private static readonly int Reloading = Animator.StringToHash("Reloading");
+    private static readonly int Inspected = Animator.StringToHash("Inspected");
 
-    private bool CanShoot() => !MenuFunctions.isGamePaused && 
-        gameObject.activeSelf && timeSinceLastShot > 1 / (data.fireRate / 60);
-
+    private bool CanShoot() => data.Reloading == false && data.MagAmmo > 0 && !MenuFunctions.IsGamePaused && 
+                               gameObject.activeSelf && _timeSinceLastShot > 1 / (data.FireRate / 60) && data.Ammo > 0;
+    
     private void Start()
     {
-        eyes = Camera.main.transform;
+        //Lol
+        _player = transform.parent.parent.parent.parent.parent.GetChild(0).transform;
+        
+        _enemyMask = LayerMask.GetMask("Enemy");
+        _eyes = Camera.main!.transform;
 
-        data.inspecting = false;
-        data.ammo = data.ammoType.GetMaxAmmo();
+        data.Inspecting = false;
+        data.Reloading = false;
+        data.Ammo = (uint)data.AmmoType.GetMaxAmmo();
+        data.MagAmmo = data.MagSize;
 
-        if (data.isAuto)
-            Shooting.autoShootInput += Shoot;
+        if (data.IsAuto)
+            Shooting.AutoShootInput += Shoot;
         else
-            Shooting.semiShootInput += Shoot;
+            Shooting.SemiShootInput += Shoot;
 
-        Shooting.inspectInput += StartInspect;
+        Shooting.ReloadInput += StartReload;
+        Shooting.InspectInput += StartInspect;
 
         try
         {
-            anim = GetComponent<Animator>();
+            _anim = GetComponent<Animator>();
         }
-        catch (Exception) 
+        catch (Exception)
         {
+            // ignored
         }
     }
 
     private void Update()
     {
-        timeSinceLastShot += Time.deltaTime;
+        _timeSinceLastShot += Time.deltaTime;
 
-        if (anim != null)
-        {
-            anim.SetBool("Walking", player.GetComponent<PlayerMovement>().isWalking);
-            anim.SetBool("Sprinting", player.GetComponent<PlayerMovement>().isSprinting);
-        }
+        if (_anim == null) return;
+        
+        _anim.SetBool(Walking, _player.GetComponent<PlayerMovement>().isWalking);
+        _anim.SetBool(Sprinting, _player.GetComponent<PlayerMovement>().isSprinting);
     }
 
-    public void Shoot()
+    private void Shoot()
     {
-        if (data.ammo > 0 && CanShoot())
+        if (!CanShoot()) return;
+        
+        if (Physics.Raycast(_eyes.position, _eyes.forward, out RaycastHit hit, data.MaxDistance, _enemyMask))
         {
-            if (Physics.Raycast(eyes.position, eyes.forward, out hit, data.maxDistance, enemyMask))
-            {
-                IDamageable damageable = hit.transform.GetComponent<IDamageable>();
-                damageable?.Damage(data.damage);
+            IDamageable damageable = hit.transform.GetComponent<IDamageable>();
+            damageable?.Damage(data.Damage);
 
-                GameObject go = Instantiate(blood, hit.point, Quaternion.identity, hit.transform);
-                Destroy(go, bloodDuration);
-            }
-
-            data.ammo--;
-            timeSinceLastShot = 0;
-            shoot = StartCoroutine(OnGunShot());
+            GameObject go = Instantiate(blood, hit.point, Quaternion.identity, hit.transform);
+            Destroy(go, bloodDuration);
         }
+
+        data.MagAmmo--;
+        _timeSinceLastShot = 0;
+        if (_anim != null)
+            _shoot = StartCoroutine(OnGunShot());
     }
 
     private IEnumerator OnGunShot()
     {
-        if (anim != null)
-        {
-            anim.SetBool("Shot", true);
+        _anim.SetBool(Shot, true);
 
-            yield return new WaitForEndOfFrame();
+        yield return new WaitForEndOfFrame();
 
-            anim.ResetTrigger("Shot");
-        }
+        _anim.ResetTrigger(Shot);
     }
 
-    public void StartInspect()
+    private void StartReload()
     {
-        if (MenuFunctions.isGamePaused) return;
+        if (MenuFunctions.IsGamePaused || !gameObject.activeSelf) return;
+        if (data.MagAmmo == data.MagSize) return;
+
+        _reload = StartCoroutine(Reload());
+    }
+
+    private IEnumerator Reload()
+    {
+        data.Reloading = true;
+        
+        if (_anim != null)
+            _anim.SetBool(Reloading, true);
+
+        yield return new WaitForSeconds(data.ReloadTime);
+        
+        //Math
+        if (data.Ammo == 0) yield break;
+        
+        if (data.MagAmmo + data.Ammo < data.MagSize)
+        {
+            data.MagAmmo += data.Ammo;
+            data.Ammo = 0;
+        }
+        else
+        {
+            data.Ammo -= data.MagSize - data.MagAmmo;
+            data.MagAmmo = data.MagSize;
+        }
+        
+        if (_anim != null)
+            _anim.ResetTrigger(Reloading);
+        data.Reloading = false;
+        }
+
+    private void StartInspect()
+    {
+        if (MenuFunctions.IsGamePaused) return;
         if (!gameObject.activeSelf) return;
 
-        inspect = StartCoroutine(Inspect());
+        _inspect = StartCoroutine(Inspect());
     }
 
-    public IEnumerator Inspect()
+    private IEnumerator Inspect()
     {
-        data.inspecting = true;
-        if (anim != null)
-        {
-            anim.SetBool("Inspected", true);
+        data.Inspecting = true;
+        
+        if (_anim != null)
+            _anim.SetBool(Inspected, true);
 
-            yield return new WaitForEndOfFrame();
-
-            anim.ResetTrigger("Inspected");
-            data.inspecting = false;
-        }
+        yield return new WaitForEndOfFrame();
+        
+        if (_anim != null)
+            _anim.ResetTrigger(Inspected);
+        
+        data.Inspecting = false;
     }
 
-    public IData GetData()
-    {
-        return data;
-    }
+    public IWeaponData GetData() => data;
 }

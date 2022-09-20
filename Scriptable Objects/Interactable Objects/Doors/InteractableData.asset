@@ -9,19 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e274c25beefee9d4987ac75d5dcc2e48, type: 3}
-  m_Name: M4
+  m_Script: {fileID: 11500000, guid: 99b49aa96658483b8b5b8eb6318bfbc8, type: 3}
+  m_Name: InteractableData
   m_EditorClassIdentifier: 
-  name: M4
-  weight: 90
-  damage: 150
-  maxDistance: 100
-  isAuto: 1
-  reloading: 0
-  magSize: 32
-  magAmmo: 27
-  ammo: 250
-  ammoType: 2
-  fireRate: 500
-  reloadTime: 1.6
-  inspecting: 0
+  cost: 100
+  timeToOpen: 1

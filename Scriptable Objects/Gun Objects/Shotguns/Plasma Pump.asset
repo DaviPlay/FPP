@@ -17,8 +17,7 @@ MonoBehaviour:
   damage: 300
   maxDistance: 50
   isAuto: 0
+  magSize: 6
   ammoType: 4
   fireRate: 92
   reloadTime: 5
-  reloading: 0
-  inspecting: 0

@@ -12,33 +12,33 @@ public class EnemySpawn : MonoBehaviour
         public float spawnRate = 1;
     }
 
-    private readonly ArrayList rounds = new ArrayList();
-    [HideInInspector] public static int nextRound = 0;
+    private readonly ArrayList _rounds = new();
+    public static int NextRound;
     public Transform enemyTransform;
     public Transform[] spawnPoints;
 
     public float timeBetweenRounds = 5;
-    private float searchCountDown = 1;
-    private float roundCountDown;
-    private float enemyHealth = 50;
+    private float _searchCountDown = 1;
+    private float _roundCountDown;
+    private float _enemyHealth = 50;
 
-    private SpawnState state = SpawnState.COUNTING;
+    private SpawnState _state = SpawnState.COUNTING;
 
-    public static Action roundSwitch;
+    public static Action RoundSwitch;
 
     private void Start()
     {
         if (spawnPoints.Length == 0)
             Debug.LogError("No spawn points referenced");
 
-        roundCountDown = timeBetweenRounds;
-        rounds.Add(CreateRound());
-        roundSwitch?.Invoke();
+        _roundCountDown = timeBetweenRounds;
+        _rounds.Add(CreateRound());
+        RoundSwitch?.Invoke();
     }
 
     private void Update()
     {
-        if (state == SpawnState.WAITING)
+        if (_state == SpawnState.WAITING)
         {
             if (!EnemyAliveCheck())
                 NewRound();
@@ -46,30 +46,30 @@ public class EnemySpawn : MonoBehaviour
                 return;
         }
 
-        if (roundCountDown <= 0)
+        if (_roundCountDown <= 0)
         {
-            if (state != SpawnState.SPAWNING)
-                StartCoroutine(SpawnRound((Round)rounds[nextRound]));
+            if (_state != SpawnState.SPAWNING)
+                StartCoroutine(SpawnRound((Round)_rounds[NextRound]));
         }
         else
-            roundCountDown -= Time.deltaTime;
+            _roundCountDown -= Time.deltaTime;
     }
 
     private void NewRound()
     {
-        state = SpawnState.COUNTING;
-        roundCountDown = timeBetweenRounds;
+        _state = SpawnState.COUNTING;
+        _roundCountDown = timeBetweenRounds;
 
-        nextRound++;
-        rounds.Add(CreateRound());
-        roundSwitch?.Invoke();
+        NextRound++;
+        _rounds.Add(CreateRound());
+        RoundSwitch?.Invoke();
     }
 
     private Round CreateRound()
     {
-        Round _round = new Round
+        Round round = new Round
         {
-            count = nextRound switch
+            count = NextRound switch
             {
                 0 => 6,
                 1 => 8,
@@ -82,62 +82,56 @@ public class EnemySpawn : MonoBehaviour
                 8 => 29,
                 9 => 33,
                 10 => 34,
-                _ => Mathf.RoundToInt(0.0842f * Mathf.Pow(nextRound, 2) + 0.1954f * nextRound + 22.05f),
+                _ => Mathf.RoundToInt(0.0842f * Mathf.Pow(NextRound, 2) + 0.1954f * NextRound + 22.05f),
             },
             enemy = enemyTransform
         };
 
-        if (nextRound >= 9)
-            enemyHealth *= 1.1f;
+        if (NextRound >= 9)
+            _enemyHealth *= 1.1f;
         else
-            enemyHealth += 100;
+            _enemyHealth += 100;
 
-        return _round;
+        return round;
     }
 
     private bool EnemyAliveCheck()
     {
-        searchCountDown -= Time.deltaTime;
+        _searchCountDown -= Time.deltaTime;
 
-        if (searchCountDown <= 0)
+        if (!(_searchCountDown <= 0)) return true;
+        
+        _searchCountDown = 1;
+
+        return GameObject.FindGameObjectWithTag("Enemy") != null;
+    }
+
+    private IEnumerator SpawnRound(Round round)
+    {
+        _state = SpawnState.SPAWNING;
+
+        for (int i = 0; i < round.count; i++)
         {
-            searchCountDown = 1;
+            SpawnEnemy(round.enemy);
 
-            if (GameObject.FindGameObjectWithTag("Enemy") == null)
-                return false;
+            yield return new WaitForSeconds(1 / round.spawnRate);
         }
 
-        return true;
+        _state = SpawnState.WAITING;
     }
 
-    private IEnumerator SpawnRound(Round _round)
+    private void SpawnEnemy(Transform enemy)
     {
-        state = SpawnState.SPAWNING;
+        Transform sp = spawnPoints[UnityEngine.Random.Range(0, spawnPoints.Length - 1)];
+        enemy.GetComponent<EnemyHealth>().SetMaxHealth(_enemyHealth);
 
-        for (int i = 0; i < _round.count; i++)
-        {
-            SpawnEnemy(_round.enemy);
-
-            yield return new WaitForSeconds(1 / _round.spawnRate);
-        }
-
-        state = SpawnState.WAITING;
-
-        yield break;
+        Instantiate(enemy, sp);
     }
 
-    public void SpawnEnemy(Transform _enemy)
-    {
-        Transform _sp = spawnPoints[UnityEngine.Random.Range(0, spawnPoints.Length - 1)];
-        _enemy.GetComponent<EnemyHealth>().SetMaxHealth(enemyHealth);
-
-        Instantiate(_enemy, _sp);
-    }
-
-    public enum SpawnState
+    private enum SpawnState
     {
         SPAWNING,
         WAITING,
         COUNTING
-    };
+    }
 }

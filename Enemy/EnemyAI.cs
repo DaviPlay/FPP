@@ -11,45 +11,48 @@ public class EnemyAI : MonoBehaviour
     public float hitDistance;
     public float hitDelay;
     public int damage;
-    private bool ray;
-    private bool hasHit = false;
+    private bool _ray;
+    private bool _hasHit;
 
-    RaycastHit hit;
+    private RaycastHit _hit;
 
     private void Start()
     {
         playerTransform = GameObject.FindGameObjectWithTag("player").transform;
     }
 
-    void Update()
+    private void Update()
     {
         Attack();
+        
         try
         {
             transform.gameObject.GetComponent<NavMeshAgent>().SetDestination(playerTransform.position);
         }
         catch (Exception)
         {
+            // ignored
         }
     }
 
     private void Attack()
     {
-        ray = Physics.Raycast(transform.position, transform.forward, out hit, hitDistance, playerMask);
+        var transform1 = transform;
+        _ray = Physics.Raycast(transform1.position, transform1.forward, out _hit, hitDistance, playerMask);
 
-        if (ray && !hasHit)
+        if (_ray && !_hasHit)
             StartCoroutine(DamagePlayer());
     }
 
     private IEnumerator DamagePlayer()
     {
-        hasHit = true;
+        _hasHit = true;
 
-        IDamageable damageable = hit.transform.GetComponent<IDamageable>();
+        IDamageable damageable = _hit.transform.GetComponent<IDamageable>();
         damageable?.Damage(damage);
 
         yield return new WaitForSeconds(hitDelay);
 
-        hasHit = false;
+        _hasHit = false;
     }
 }

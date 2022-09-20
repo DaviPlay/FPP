@@ -3,38 +3,38 @@ using UnityEngine;
 
 public class EnemyHealth : MonoBehaviour, IDamageable
 {
-    private static float maxHealth = 50;
-    private readonly HealthSystem healthSystem = new HealthSystem(maxHealth);
+    private static float _maxHealth = 50;
+    private readonly HealthSystem _healthSystem = new(_maxHealth);
 
-    public static Action damageEvent;
-    public static Action killEvent;
+    public static Action DamageEvent;
+    public static Action KillEvent;
 
     public void Damage(float damage)
     {
-        healthSystem.Damage(damage);
-        damageEvent?.Invoke();
+        _healthSystem.Damage(damage);
+        DamageEvent?.Invoke();
 
-        if (healthSystem.Health == 0) Kill();
+        if (_healthSystem.Health == 0) Kill();
     }
 
-    public void Kill()
+    private void Kill()
     {
         Destroy(gameObject);
-        killEvent?.Invoke();
+        KillEvent?.Invoke();
     }
 
     public void SetMaxHealth(float healthMax)
     {
-        maxHealth = healthMax;
+        _maxHealth = healthMax;
     }
 
     public float GetMaxHealth()
     {
-        return healthSystem.HealthMax;
+        return _healthSystem.HealthMax;
     }
 
     public float GetHealth()
     {
-        return healthSystem.Health;
+        return _healthSystem.Health;
     }
 }

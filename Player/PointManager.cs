@@ -2,14 +2,17 @@ using UnityEngine;
 
 public class PointManager : MonoBehaviour
 {
-    public static int points = 0;
+    public int pointsOnDamage;
+    public int pointsOnKill;
+    
+    public static int Points;
 
     private void Start()
     {
-        EnemyHealth.damageEvent += AddDamagePoints;
-        EnemyHealth.killEvent += AddKillPoints;
+        EnemyHealth.DamageEvent += AddDamagePoints;
+        EnemyHealth.KillEvent += AddKillPoints;
     }
 
-    private void AddDamagePoints() => points += 10;
-    private void AddKillPoints() => points += 50;
+    private void AddDamagePoints() => Points += pointsOnDamage;
+    private void AddKillPoints() => Points += pointsOnKill;
 }

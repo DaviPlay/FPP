@@ -5,13 +5,13 @@ public class PointsCounter : MonoBehaviour
 {
     [SerializeField] private Text points;
 
-    void Start()
+    private void Start()
     {
-        EnemyHealth.damageEvent += UpdateText;
-        EnemyHealth.killEvent += UpdateText;
+        EnemyHealth.DamageEvent += UpdateText;
+        EnemyHealth.KillEvent += UpdateText;
 
-        points.text = "0";
+        points.text = PointManager.Points.ToString();
     }
 
-    private void UpdateText() => points.text = PointManager.points.ToString();
+    private void UpdateText() => points.text = PointManager.Points.ToString();
 }

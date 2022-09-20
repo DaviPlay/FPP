@@ -17,11 +17,11 @@ MonoBehaviour:
   damage: 20
   maxDistance: 50
   isAuto: 0
-  magAmmo: 8
+  reloading: 0
   magSize: 8
-  reserveAmmo: 80
-  reserveSize: 80
+  magAmmo: 8
+  ammo: 150
+  ammoType: 0
   fireRate: 625
   reloadTime: 1.2
-  reloading: 0
   inspecting: 0

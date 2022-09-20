@@ -10,26 +10,25 @@ public enum AmmoType
     [AmmoTypeAttr(100)] SHOTGUN,
     [AmmoTypeAttr(50)] SNIPER,
     [AmmoTypeAttr(0)] NONE
-};
+}
 
 public class AmmoTypeAttr : Attribute
 {
-    internal int maxAmmo;
-    internal AmmoType ammoType;
+    internal readonly int MaxAmmo;
 
     internal AmmoTypeAttr(int maxAmmo)
     {
-        this.maxAmmo = maxAmmo;
+        MaxAmmo = maxAmmo;
     }
 }
 
 public static class AmmoTypes
 {
-    public static int GetMaxAmmo(this AmmoType _at) => GetAttr(_at).maxAmmo;
+    public static int GetMaxAmmo(this AmmoType at) => GetAttr(at).MaxAmmo;
 
-    public static AmmoTypeAttr GetAttr(AmmoType _at)
-        => (AmmoTypeAttr)Attribute.GetCustomAttribute(ForValue(_at), typeof(AmmoTypeAttr));
+    private static AmmoTypeAttr GetAttr(AmmoType at)
+        => (AmmoTypeAttr)Attribute.GetCustomAttribute(ForValue(at), typeof(AmmoTypeAttr));
 
-    public static MemberInfo ForValue(AmmoType _at)
-        => typeof(AmmoType).GetField(Enum.GetName(typeof(AmmoType), _at));
+    private static MemberInfo ForValue(AmmoType at)
+        => typeof(AmmoType).GetField(Enum.GetName(typeof(AmmoType), at));
 }

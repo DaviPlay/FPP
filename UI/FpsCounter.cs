@@ -6,21 +6,20 @@ public class FpsCounter : MonoBehaviour
     [SerializeField] private Text fpsText;
     [SerializeField] private float hudRefreshRate = 1;
 
-    private float timer;
+    private float _timer;
 
-    void Start()
+    private void Start()
     {
-        MenuFunctions.fpsCheckEvent += EnableAndDisable;
+        MenuFunctions.FPSCheckEvent += EnableAndDisable;
     }
 
     private void Update()
     {
-        if (Time.unscaledTime > timer)
-        {
-            int fps = (int)(1 / Time.unscaledDeltaTime);
-            fpsText.text = fps + " FPS";
-            timer = Time.unscaledTime + hudRefreshRate;
-        }
+        if (!(Time.unscaledTime > _timer)) return;
+        
+        int fps = (int)(1 / Time.unscaledDeltaTime);
+        fpsText.text = fps + " FPS";
+        _timer = Time.unscaledTime + hudRefreshRate;
     }
 
     private void EnableAndDisable()
