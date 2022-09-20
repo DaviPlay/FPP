@@ -9,8 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 99b49aa96658483b8b5b8eb6318bfbc8, type: 3}
+  m_Script: {fileID: 11500000, guid: 24d44296f27a4ae2984fea012f191fdf, type: 3}
   m_Name: InteractableData
   m_EditorClassIdentifier: 
-  cost: 100
-  timeToOpen: 1
+  cost: 1000
+  timeToOpen: 0

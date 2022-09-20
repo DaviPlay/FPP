@@ -38,23 +38,6 @@ public class Shooting : MonoBehaviour
             {
                 if (_weaponData.MagAmmo > 0)
                 {
-                    SemiShootInput?.Invoke();
-                    UpdateText?.Invoke();
-                }
-                else if (MenuFunctions.IsAutoReload)
-                {
-                    ReloadInput?.Invoke();
-                    UpdateText?.Invoke();
-                }
-            }
-            else
-                MeleeAttackInput?.Invoke();
-
-        if (Input.GetButtonDown("Fire1"))
-            if (_weaponData is GunData)
-            {
-                if (_weaponData.MagAmmo > 0)
-                {
                     AutoShootInput?.Invoke();
                     UpdateText?.Invoke();
                 }
@@ -66,11 +49,24 @@ public class Shooting : MonoBehaviour
             else
                 MeleeAttackInput?.Invoke();
 
+        if (Input.GetButtonDown("Fire1"))
+            if (_weaponData is GunData)
+            {
+                if (_weaponData.MagAmmo > 0)
+                {
+                    SemiShootInput?.Invoke();
+                    UpdateText?.Invoke();
+                }
+                else if (MenuFunctions.IsAutoReload)
+                {
+                    ReloadInput?.Invoke();
+                }
+            }
+            else
+                MeleeAttackInput?.Invoke();
+
         if (Input.GetButtonDown("Reload"))
-        {
             ReloadInput?.Invoke();
-            UpdateText?.Invoke();
-        }
 
         if (Input.GetButtonDown("Inspect"))
             InspectInput?.Invoke();

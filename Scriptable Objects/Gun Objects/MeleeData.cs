@@ -27,7 +27,7 @@ public class MeleeData : ScriptableObject, IWeaponData
     public uint MagSize => 0;
     public uint MagAmmo { get => 0; set {} }
     public uint Ammo { get => 0; set {} }
-    public AmmoType AmmoType => AmmoType.NONE;
+    public AmmoType AmmoType => AmmoType.None;
     
     public bool Inspecting { get; set; }
     public bool Attacking { get; set; }

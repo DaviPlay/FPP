@@ -22,7 +22,7 @@ public class EnemySpawn : MonoBehaviour
     private float _roundCountDown;
     private float _enemyHealth = 50;
 
-    private SpawnState _state = SpawnState.COUNTING;
+    private SpawnState _state = SpawnState.Counting;
 
     public static Action RoundSwitch;
 
@@ -38,7 +38,7 @@ public class EnemySpawn : MonoBehaviour
 
     private void Update()
     {
-        if (_state == SpawnState.WAITING)
+        if (_state == SpawnState.Waiting)
         {
             if (!EnemyAliveCheck())
                 NewRound();
@@ -48,7 +48,7 @@ public class EnemySpawn : MonoBehaviour
 
         if (_roundCountDown <= 0)
         {
-            if (_state != SpawnState.SPAWNING)
+            if (_state != SpawnState.Spawning)
                 StartCoroutine(SpawnRound((Round)_rounds[NextRound]));
         }
         else
@@ -57,7 +57,7 @@ public class EnemySpawn : MonoBehaviour
 
     private void NewRound()
     {
-        _state = SpawnState.COUNTING;
+        _state = SpawnState.Counting;
         _roundCountDown = timeBetweenRounds;
 
         NextRound++;
@@ -108,7 +108,7 @@ public class EnemySpawn : MonoBehaviour
 
     private IEnumerator SpawnRound(Round round)
     {
-        _state = SpawnState.SPAWNING;
+        _state = SpawnState.Spawning;
 
         for (int i = 0; i < round.count; i++)
         {
@@ -117,7 +117,7 @@ public class EnemySpawn : MonoBehaviour
             yield return new WaitForSeconds(1 / round.spawnRate);
         }
 
-        _state = SpawnState.WAITING;
+        _state = SpawnState.Waiting;
     }
 
     private void SpawnEnemy(Transform enemy)
@@ -130,8 +130,8 @@ public class EnemySpawn : MonoBehaviour
 
     private enum SpawnState
     {
-        SPAWNING,
-        WAITING,
-        COUNTING
+        Spawning,
+        Waiting,
+        Counting
     }
 }

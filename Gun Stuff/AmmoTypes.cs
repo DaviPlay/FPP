@@ -3,13 +3,13 @@ using System.Reflection;
 
 public enum AmmoType
 {
-    [AmmoTypeAttr(150)] PISTOL,
-    [AmmoTypeAttr(300)] SMG,
-    [AmmoTypeAttr(250)] RIFLE,
-    [AmmoTypeAttr(500)] LMG,
-    [AmmoTypeAttr(100)] SHOTGUN,
-    [AmmoTypeAttr(50)] SNIPER,
-    [AmmoTypeAttr(0)] NONE
+    [AmmoTypeAttr(150)] Pistol,
+    [AmmoTypeAttr(300)] Smg,
+    [AmmoTypeAttr(250)] Rifle,
+    [AmmoTypeAttr(500)] Lmg,
+    [AmmoTypeAttr(100)] Shotgun,
+    [AmmoTypeAttr(50)] Sniper,
+    [AmmoTypeAttr(0)] None
 }
 
 public class AmmoTypeAttr : Attribute

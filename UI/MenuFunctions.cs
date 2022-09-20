@@ -16,7 +16,7 @@ public class MenuFunctions : MonoBehaviour
     public static int HoldToSprint { get; private set; }
     public static int HoldToCrouch { get; private set; }
 
-    public static Action AutoReloadEvent;
+    private static Action _autoReloadEvent;
     public static Action FPSCheckEvent;
 
     private void Start()
@@ -89,7 +89,7 @@ public class MenuFunctions : MonoBehaviour
     public void AutoReloadCheck(bool value)
     {
         IsAutoReload = value;
-        AutoReloadEvent?.Invoke();
+        _autoReloadEvent?.Invoke();
     }
 
     public void ReadFpsCheck(bool value)

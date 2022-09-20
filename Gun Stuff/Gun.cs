@@ -130,8 +130,11 @@ public class Gun : MonoBehaviour, IWeapon
             data.MagAmmo = data.MagSize;
         }
         
+        Shooting.UpdateText?.Invoke();
+        
         if (_anim != null)
             _anim.ResetTrigger(Reloading);
+        
         data.Reloading = false;
         }
 

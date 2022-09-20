@@ -13,13 +13,13 @@ public class Door : MonoBehaviour, IInteractable
         
         if (!data.IsOpen)
         {
-            hinge.rotation = Quaternion.Euler(rotation.x, rotation.y + 90, rotation.z);
+            hinge.rotation = Quaternion.Euler(rotation.x, rotation.y - 90, rotation.z);
             
             data.IsOpen = true;
         }
         else
         {
-            hinge.rotation = Quaternion.Euler(rotation.x, rotation.y - 90, rotation.z);
+            hinge.rotation = Quaternion.Euler(rotation.x, rotation.y + 90, rotation.z);
             
             data.IsOpen = false;
         }

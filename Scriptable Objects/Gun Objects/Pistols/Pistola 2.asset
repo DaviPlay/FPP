@@ -9,7 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e274c25beefee9d4987ac75d5dcc2e48, type: 3}
+  m_Script: {fileID: 11500000, guid: 09803a1bb804448883a24f5fee8be861, type: 3}
   m_Name: Pistola 2
   m_EditorClassIdentifier: 
   name: Pistola 2
@@ -17,11 +17,7 @@ MonoBehaviour:
   damage: 50
   maxDistance: 50
   isAuto: 1
-  reloading: 0
-  magSize: 24
-  magAmmo: 24
-  ammo: 150
+  magSize: 16
   ammoType: 0
-  fireRate: 800
-  reloadTime: 1.5
-  inspecting: 0
+  fireRate: 600
+  reloadTime: 1
