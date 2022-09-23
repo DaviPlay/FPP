@@ -8,6 +8,12 @@ public class Door : MonoBehaviour, IInteractable
     //(I'm not even gonna attempt to lerp it)
     public void OnInteract(RaycastHit hit)
     {
+        if (data.Cost > PointManager.Points)
+            return;
+
+        PointManager.Points -= data.Cost;
+        Shooting.UpdateText?.Invoke();
+        
         Transform hinge = hit.transform.parent;
         Vector3 rotation = hinge.rotation.eulerAngles;
         

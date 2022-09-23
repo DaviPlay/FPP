@@ -19,17 +19,58 @@ public class GunData : ScriptableObject, IWeaponData
     [Tooltip("In Seconds")] 
     [SerializeField] private float reloadTime;
     
-    public string Name => name;
-    public float Weight => weight;
-    public float Damage => damage;
-    public float MaxDistance => maxDistance;
-    public bool IsAuto => isAuto;
+    public string Name
+    {
+        get => name;
+        set => name = value;
+    }
+
+    public float Weight
+    {
+        get => weight;
+        set => weight = value;
+    }
+
+    public float Damage
+    {
+        get => damage;
+        set => damage = value;
+    }
+
+    public float MaxDistance
+    {
+        get => maxDistance;
+        set => maxDistance = value;
+    }
+
+    public bool IsAuto
+    {
+        get => isAuto;
+        set => isAuto = value;
+    }
+
     public bool Reloading { get; set; }
-    public uint MagSize => magSize;
+    public uint MagSize
+    {
+        get => magSize;
+        set => magSize = value;
+    }
+
     public uint MagAmmo { get; set; }
     public uint Ammo { get; set; }
     public AmmoType AmmoType => ammoType;
-    public float FireRate => fireRate;
-    public float ReloadTime => reloadTime;
+
+    public float FireRate
+    {
+        get => fireRate;
+        set => fireRate = value;
+    }
+
+    public float ReloadTime
+    {
+        get => reloadTime;
+        set => reloadTime = value;
+    }
+
     public bool Inspecting { get; set; }
 }

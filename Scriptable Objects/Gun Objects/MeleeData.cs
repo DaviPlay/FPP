@@ -18,10 +18,30 @@ public class MeleeData : ScriptableObject, IWeaponData
     [SerializeField] private float attackDelay;
 
     public string Name => name;
-    public float Weight => weight;
-    public float Damage => damage;
-    public float MaxDistance => maxDistance;
-    public float FireRate => fireRate;
+    public float Weight
+    {
+        get => weight;
+        set => weight = value;
+    }
+
+    public float Damage
+    {
+        get => damage;
+        set => damage = value;
+    }
+
+    public float MaxDistance
+    {
+        get => maxDistance;
+        set => maxDistance = value;
+    }
+
+    public float FireRate
+    {
+        get => fireRate;
+        set => fireRate = value;
+    }
+
     public float AttackDelay => attackDelay;
     public bool Reloading => false;
     public uint MagSize => 0;

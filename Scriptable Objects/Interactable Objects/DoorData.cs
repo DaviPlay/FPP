@@ -8,7 +8,17 @@ public class DoorData : ScriptableObject, IInteractableData
     [Tooltip("In milliseconds")]
     [SerializeField] private float timeToOpen;
 
-    public uint Cost { get; set; }
-    public float TimeToOpen => timeToOpen;
+    public uint Cost
+    {
+        get => cost;
+        set => cost = value;
+    }
+    
+    public float TimeToOpen
+    {
+        get => timeToOpen;
+        set => timeToOpen = value;
+    }
+
     public bool IsOpen { get; set; }
 }

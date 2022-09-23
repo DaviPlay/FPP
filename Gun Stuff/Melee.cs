@@ -30,7 +30,9 @@ public class Melee : MonoBehaviour, IWeapon
 
     private void Start()
     {
-        _player = transform.parent.parent.parent.parent.parent.GetChild(0).transform;
+        //Lol again
+        _player = transform.parent.parent.parent.parent.GetChild(0);
+        
         _enemyMask = LayerMask.GetMask("Enemy");
         _eyes = Camera.main!.transform;
 

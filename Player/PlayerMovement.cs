@@ -40,17 +40,17 @@ public class PlayerMovement : MonoBehaviour
     [HideInInspector] public bool isWalking;
     [HideInInspector] public bool isSprinting;
     [HideInInspector] public bool isCrouching;
+    [HideInInspector] public bool isSliding;
     private bool _isCurrentlySprinting, _justSprinted, _stoppedSprinting;
     private bool _isCurrentlyCrouching, _justCrouched, _stoppedCrouching;
-    private bool _isSliding;
     private bool _hasJumped;
     private bool _hasLedged;
     private float _x, _z;
 
     private Vector3 _velocity;
     private Vector3 _move;
-    private readonly Vector3 _walkScale = new Vector3(1, 1.5f, 1);
-    private readonly Vector3 _crouchScale = new Vector3(1, 0.5f, 1);
+    private readonly Vector3 _walkScale = new(1, 1.5f, 1);
+    private readonly Vector3 _crouchScale = new(1, 0.5f, 1);
     private Vector3 _walkTpPosition;
     private Vector3 _crouchTpPosition;
 
@@ -131,7 +131,7 @@ public class PlayerMovement : MonoBehaviour
         if (_isGrounded && _hasJumped && _velocity.y < 0) _hasJumped = false;
 
         if (_hasJumped && isCrouching) StopCrouch();
-        if (_hasJumped && _isSliding) _isSliding = false;
+        if (_hasJumped && isSliding) isSliding = false;
     }
 
     private void Sprint()
@@ -168,6 +168,7 @@ public class PlayerMovement : MonoBehaviour
         isSprinting = true;
 
         isWalking = false;
+        if (isCrouching) StopCrouch();
         ChangeSpeed(sprintSpeedMultiplier);
         if (_isChangingFov) StopCoroutine(_changeFov);
         _changeFov = StartCoroutine(ChangeFov(fov * sprintFovMultiplier));
@@ -210,7 +211,7 @@ public class PlayerMovement : MonoBehaviour
         isCrouching = true;
 
         //Setting the crouch speed
-        if (!isSprinting && !_isSliding)
+        if (!isSprinting && !isSliding)
             ChangeSpeed(crouchSpeedMultiplier);
 
         //Changing the size of the player and teleporting it
@@ -227,7 +228,7 @@ public class PlayerMovement : MonoBehaviour
     private void StopCrouch()
     {
         isCrouching = false;
-        _isSliding = false;
+        isSliding = false;
 
         //Setting the speed and changing the fov
         if (_isGrounded)
@@ -263,14 +264,14 @@ public class PlayerMovement : MonoBehaviour
         //Changing speed and fov
         if (_isGrounded && isCrouching && _justCrouched && isSprinting)
         {
-            _isSliding = true;
+            isSliding = true;
             ChangeSpeed(slideForce);
             if (_isChangingFov) StopCoroutine(_changeFov);
             _changeFov = StartCoroutine(ChangeFov(fov * slideFovMultiplier));
         }
 
         //Slowing down while sliding
-        if (_isSliding)
+        if (isSliding)
         {
             if (_isGrounded)
                 _currentSpeed -= _currentSpeed * slideCounterForce;
@@ -279,17 +280,17 @@ public class PlayerMovement : MonoBehaviour
         }
         
         //Resetting speed when it is under default crouch speed
-        if (_isSliding && _currentSpeed < walkSpeed * crouchSpeedMultiplier)
+        if (isSliding && _currentSpeed < walkSpeed * crouchSpeedMultiplier)
         {
             ChangeSpeed(crouchSpeedMultiplier);
             if (_isChangingFov) StopCoroutine(_changeFov);
             _changeFov = StartCoroutine(ChangeFov(fov));
-            _isSliding = false;
+            isSliding = false;
             return;
         }
 
         if (MenuFunctions.HoldToCrouch != 1 || !_stoppedCrouching) return;
-        _isSliding = false;
+        isSliding = false;
 
         if (!_isGrounded)
             StartCoroutine(StopSlide());
@@ -313,7 +314,7 @@ public class PlayerMovement : MonoBehaviour
     private IEnumerator StopSlide()
     {
         yield return new WaitUntil(() => _isGrounded);
-        _isSliding = false;
+        isSliding = false;
 
         if (isSprinting)
         {

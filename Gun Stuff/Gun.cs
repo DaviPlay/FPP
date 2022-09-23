@@ -33,7 +33,7 @@ public class Gun : MonoBehaviour, IWeapon
     private void Start()
     {
         //Lol
-        _player = transform.parent.parent.parent.parent.parent.GetChild(0).transform;
+        _player = transform.parent.parent.parent.parent.GetChild(0);
         
         _enemyMask = LayerMask.GetMask("Enemy");
         _eyes = Camera.main!.transform;

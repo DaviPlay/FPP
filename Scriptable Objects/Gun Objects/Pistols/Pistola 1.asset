@@ -19,5 +19,5 @@ MonoBehaviour:
   isAuto: 0
   magSize: 8
   ammoType: 0
-  fireRate: 500
+  fireRate: 750
   reloadTime: 1.1

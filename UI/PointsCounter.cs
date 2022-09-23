@@ -7,11 +7,12 @@ public class PointsCounter : MonoBehaviour
 
     private void Start()
     {
-        EnemyHealth.DamageEvent += UpdateText;
-        EnemyHealth.KillEvent += UpdateText;
+        EnemyHealth.DamageEvent += OnUpdateText;
+        EnemyHealth.KillEvent += OnUpdateText;
+        Shooting.UpdateText += OnUpdateText;
 
         points.text = PointManager.Points.ToString();
     }
 
-    private void UpdateText() => points.text = PointManager.Points.ToString();
+    private void OnUpdateText() => points.text = PointManager.Points.ToString();
 }

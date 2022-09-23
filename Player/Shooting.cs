@@ -4,29 +4,22 @@ using UnityEngine;
 public class Shooting : MonoBehaviour
 {
     private int _selectedWeapon;
-
+    private static IWeaponData _weaponData;
+    
     public static Action SemiShootInput;
     public static Action AutoShootInput;
     public static Action MeleeAttackInput;
     public static Action ReloadInput;
     public static Action InspectInput;
     public static Action WeaponSwitchInput;
-
     public static Action UpdateText;
-
-    private static IWeapon _weapon;
-    private static IWeaponData _weaponData;
 
     private void Start()
     {
         foreach (Transform gunContainer in transform)
-            foreach (Transform gunParent in gunContainer)
-                foreach (Transform gun in gunParent)
-                    if (gun.gameObject.activeSelf)
-                    {
-                        _weapon = gun.gameObject.GetComponent<Gun>() != null ? gun.gameObject.GetComponent<Gun>() : gun.gameObject.GetComponent<Melee>();
-                        _weaponData = _weapon is Gun ? gun.gameObject.GetComponent<Gun>().GetData() : gun.gameObject.GetComponent<Melee>().GetData();
-                    }
+            foreach (Transform gun in gunContainer)
+                if (gun.gameObject.activeSelf)
+                    _weaponData = gun.gameObject.GetComponent<IWeapon>().GetData();
 
         UpdateText?.Invoke();
     }
@@ -77,16 +70,19 @@ public class Shooting : MonoBehaviour
     private void SwitchWeapon()
     {
         if (MenuFunctions.IsGamePaused) return;
+        
         int previousWeapon = _selectedWeapon;
 
-        if (Input.GetAxis("Scroll") > 0)
+        //Down
+        if (Input.GetAxis("Scroll") < 0)
         {
             if (_selectedWeapon >= transform.childCount - 1)
                 _selectedWeapon = 0;
             else
                 _selectedWeapon++;
         }
-        if (Input.GetAxis("Scroll") < 0)
+        //Up
+        if (Input.GetAxis("Scroll") > 0)
         {
             if (_selectedWeapon <= 0)
                 _selectedWeapon = transform.childCount - 1;
@@ -102,21 +98,19 @@ public class Shooting : MonoBehaviour
     {
         int i = 0;
         foreach (Transform gunContainer in transform)
-            foreach (Transform gunParent in gunContainer)
-                foreach (Transform gun in gunParent)
+            foreach (Transform gun in gunContainer)
+            {
+                if (i == _selectedWeapon)
                 {
-                    if (i == _selectedWeapon)
-                    {
-                        gun.gameObject.SetActive(true);
-                        _weapon = gun.gameObject.GetComponent<Gun>() != null ? gun.gameObject.GetComponent<Gun>() : gun.gameObject.GetComponent<Melee>();
-                        _weaponData = _weapon is Gun ? gun.gameObject.GetComponent<Gun>().GetData() : gun.gameObject.GetComponent<Melee>().GetData();
-                        WeaponSwitchInput?.Invoke();
-                    }
-                    else
-                        gun.gameObject.SetActive(false);
-
-                    i++;
+                    gun.gameObject.SetActive(true);
+                    _weaponData = gun.gameObject.GetComponent<IWeapon>().GetData();
+                    WeaponSwitchInput?.Invoke();
                 }
+                else
+                    gun.gameObject.SetActive(false);
+
+                i++;
+            }
 
         UpdateText?.Invoke();
     }
