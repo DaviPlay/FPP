@@ -1,36 +1,40 @@
 ﻿using System;
+using Interfaces;
 using UnityEngine;
 
-public class InteractManager : MonoBehaviour
+namespace Player
 {
-    [SerializeField] private int interactDistance;
-    private LayerMask _interactableMask;
-    private Transform _eyes;
-
-    private static Action _interactInput;
-
-    private void Start()
+    public class InteractManager : MonoBehaviour
     {
-        _interactableMask = LayerMask.GetMask("Interactable");
-        _eyes = Camera.main!.transform;
-        _interactInput += Interact;
+        [SerializeField] private int interactDistance;
+        private LayerMask _interactableMask;
+        private Transform _eyes;
+
+        private static Action _interactInput;
+
+        private void Start()
+        {
+            _interactableMask = LayerMask.GetMask("Interactable");
+            _eyes = Camera.main!.transform;
+            _interactInput += Interact;
         
-        InteractDistance = interactDistance;
-    }
+            InteractDistance = interactDistance;
+        }
 
-    private void Update()
-    {
-        if (Input.GetButtonDown("Interact"))
-            _interactInput?.Invoke();
-    }
+        private void Update()
+        {
+            if (Input.GetButtonDown("Interact"))
+                _interactInput?.Invoke();
+        }
 
-    private void Interact()
-    {
-        if (!Physics.Raycast(_eyes.position, _eyes.forward, out RaycastHit hit, InteractDistance, _interactableMask)) return;
+        private void Interact()
+        {
+            if (!Physics.Raycast(_eyes.position, _eyes.forward, out RaycastHit hit, InteractDistance, _interactableMask)) return;
         
-        IInteractable interactable = hit.transform.GetComponent<IInteractable>();
-        interactable?.OnInteract(hit);
-    }
+            IInteractable interactable = hit.transform.GetComponent<IInteractable>();
+            interactable?.OnInteract(hit);
+        }
 
-    private static int InteractDistance { get; set; }
+        private static int InteractDistance { get; set; }
+    }
 }

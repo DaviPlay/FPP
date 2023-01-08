@@ -1,115 +1,143 @@
 using System;
+using Player;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class MenuFunctions : MonoBehaviour
+namespace UI
 {
-    public GameObject menu;
-    public GameObject player;
-    public GameObject guns;
-    public Camera camera;
-    public Slider fovSlider, sensitivitySlider;
-
-    public static bool IsGamePaused;
-    public static bool IsAutoReload { get; private set; } = true;
-    public static bool FpsCheck { get; private set; } = true;
-    public static int HoldToSprint { get; private set; }
-    public static int HoldToCrouch { get; private set; }
-
-    private static Action _autoReloadEvent;
-    public static Action FPSCheckEvent;
-
-    private void Start()
+    public class MenuFunctions : MonoBehaviour
     {
-        fovSlider.value = camera.fieldOfView;
-        fovSlider.GetComponentInChildren<InputField>().text = camera.fieldOfView.ToString();
+        public GameObject menu;
+        public GameObject player;
+        public new Camera camera;
+        public Slider fovSlider, sensitivitySlider;
+        public TMP_InputField fovInput, sensitivityInput;
 
-        sensitivitySlider.value = camera.GetComponent<CameraMovement>().mouseSensitivity;
-        sensitivitySlider.GetComponentInChildren<InputField>().text = camera.GetComponent<CameraMovement>().mouseSensitivity.ToString();
-    }
+        public static bool IsGamePaused;
+        public static bool IsAutoReload { get; private set; } = true;
+        public static bool FpsCheck { get; private set; } = true;
+        public static int HoldToSprint { get; private set; }
+        public static int HoldToCrouch { get; private set; }
 
-    private void Update()
-    {
-        if (!Input.GetKeyDown(KeyCode.Escape)) return;
-        
-        if (!IsGamePaused)
-            Pause();
-        else
-            Resume();
-    }
+        private static Action _autoReloadEvent;
+        public static Action FPSCheckEvent;
 
-    private void Pause()
-    {
-        menu.SetActive(true);
+        private void Start()
+        {
+            fovSlider.maxValue = 180;
+            fovSlider.value = camera.fieldOfView;
+            fovInput.text = camera.fieldOfView.ToString();
 
-        Cursor.lockState = CursorLockMode.None;
+            sensitivitySlider.maxValue = 100;
+            sensitivitySlider.value = camera.GetComponent<CameraMovement>().mouseSensitivity;
+            sensitivityInput.text = camera.GetComponent<CameraMovement>().mouseSensitivity.ToString();
+        }
 
-        Time.timeScale = 0;
+        private void Update()
+        {
+            if (!Input.GetKeyDown(KeyCode.Escape)) return;
+            
+            if (!IsGamePaused)
+                Pause();
+            else
+                Resume();
+        }
 
-        IsGamePaused = true;
-    }
+        private void Pause()
+        {
+            menu.SetActive(true);
 
-    private void Resume()
-    {
-        menu.SetActive(false);
+            Cursor.lockState = CursorLockMode.None;
 
-        Cursor.lockState = CursorLockMode.Locked;
+            Time.timeScale = 0;
 
-        Time.timeScale = 1;
+            IsGamePaused = true;
+        }
 
-        IsGamePaused = false;
-    }
+        private void Resume()
+        {
+            menu.SetActive(false);
 
-    public void FovSlider(float newFov)
-    {
-        player.GetComponent<PlayerMovement>().fov = newFov;
-        camera.fieldOfView = newFov;
-        fovSlider.GetComponentInChildren<InputField>().text = newFov.ToString();
-    }
+            Cursor.lockState = CursorLockMode.Locked;
 
-    public void FovInput(string newFov)
-    {
-        player.GetComponent<PlayerMovement>().fov = float.Parse(newFov);
-        camera.fieldOfView = float.Parse(newFov);
-        fovSlider.value = float.Parse(newFov);
-    }
+            Time.timeScale = 1;
 
-    public void SensitivitySlider(float newSensitivity)
-    {
-        camera.GetComponent<CameraMovement>().mouseSensitivity = newSensitivity;
-        sensitivitySlider.GetComponentInChildren<InputField>().text = newSensitivity.ToString();
-    }
+            IsGamePaused = false;
+        }
 
-    public void SensitivityInput(string newSensitivity)
-    {
-        camera.GetComponent<CameraMovement>().mouseSensitivity = float.Parse(newSensitivity);
-        sensitivitySlider.value = float.Parse(newSensitivity);
-    }
+        public void FovSlider(float newFov)
+        {
+            player.GetComponent<PlayerMovement>().fov = newFov;
+            camera.fieldOfView = (int)newFov;
+            fovInput.text = ((int)newFov).ToString();
+        }
 
-    public void AutoReloadCheck(bool value)
-    {
-        IsAutoReload = value;
-        _autoReloadEvent?.Invoke();
-    }
+        public void FovInput(string newFov)
+        {
+            var fov = 0;
+            try
+            {
+                fov = Mathf.Clamp((int)float.Parse(newFov), 0, 180);
+            }
+            catch (FormatException)
+            {
+                
+            }
 
-    public void ReadFpsCheck(bool value)
-    {
-        FpsCheck = value;
-        FPSCheckEvent?.Invoke();
-    }
+            fovInput.text = fov.ToString();
+            player.GetComponent<PlayerMovement>().fov = fov;
+            camera.fieldOfView = fov;
+            fovSlider.value = fov;
+        }
 
-    public void ReadHoldToSprint(int value)
-    {
-        HoldToSprint = value;
-    }
+        public void SensitivitySlider(float newSensitivity)
+        {
+            camera.GetComponent<CameraMovement>().mouseSensitivity = (int)newSensitivity;
+            sensitivityInput.text = ((int)newSensitivity).ToString();
+        }
 
-    public void ReadHoldToCrouch(int value)
-    {
-        HoldToCrouch = value;
-    }
+        public void SensitivityInput(string newSensitivity)
+        {
+            var sensitivity = 0;
+            try
+            {
+                sensitivity = (int)Mathf.Clamp(float.Parse(newSensitivity), 0, 100);
+            }
+            catch (FormatException)
+            {
+            }
 
-    public void ExitGame()
-    {
-        Application.Quit();
+            sensitivityInput.text = sensitivity.ToString();
+            camera.GetComponent<CameraMovement>().mouseSensitivity = sensitivity;
+            sensitivitySlider.value = sensitivity;
+        }
+
+        public void AutoReloadCheck(bool value)
+        {
+            IsAutoReload = value;
+            _autoReloadEvent?.Invoke();
+        }
+
+        public void ReadFpsCheck(bool value)
+        {
+            FpsCheck = value;
+            FPSCheckEvent?.Invoke();
+        }
+
+        public void ReadHoldToSprint(int value)
+        {
+            HoldToSprint = value;
+        }
+
+        public void ReadHoldToCrouch(int value)
+        {
+            HoldToCrouch = value;
+        }
+
+        public void ExitGame()
+        {
+            Application.Quit();
+        }
     }
 }

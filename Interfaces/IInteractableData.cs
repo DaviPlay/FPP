@@ -1,4 +1,7 @@
-﻿public interface IInteractableData
+﻿namespace Interfaces
 {
-    public uint Cost { get; set; }
+    public interface IInteractableData
+    {
+        public uint Cost { get; set; }
+    }
 }

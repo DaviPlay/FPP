@@ -1,7 +1,10 @@
 using UnityEngine;
 
-public interface IInteractable
+namespace Interfaces
 {
-    public void OnInteract(RaycastHit hit);
-    public IInteractableData GetData();
+    public interface IInteractable
+    {
+        public void OnInteract(RaycastHit hit);
+        public IInteractableData GetData();
+    }
 }

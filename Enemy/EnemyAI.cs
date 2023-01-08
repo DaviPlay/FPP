@@ -1,58 +1,51 @@
 using System;
 using System.Collections;
+using Interfaces;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class EnemyAI : MonoBehaviour
+namespace Enemy
 {
-    public LayerMask playerMask;
-    public Transform playerTransform;
-
-    public float hitDistance;
-    public float hitDelay;
-    public int damage;
-    private bool _ray;
-    private bool _hasHit;
-
-    private RaycastHit _hit;
-
-    private void Start()
+    public class EnemyAI : MonoBehaviour
     {
-        playerTransform = GameObject.FindGameObjectWithTag("player").transform;
-    }
-
-    private void Update()
-    {
-        Attack();
+        [SerializeField] private LayerMask playerMask;
         
-        try
+        private Transform _playerTransform;
+
+        public float hitDistance;
+        [Tooltip("In seconds")] public float hitDelay;
+        public int damage;
+        private bool _ray;
+        private bool _hasHit;
+
+        private RaycastHit _hit;
+
+        private void Start() => _playerTransform = GameObject.FindWithTag("player").transform;
+        
+        private void Update()
         {
-            transform.gameObject.GetComponent<NavMeshAgent>().SetDestination(playerTransform.position);
+            var transform1 = transform;
+            _ray = Physics.Raycast(transform1.position, transform1.forward, out _hit, hitDistance, playerMask);
+            
+            if (_ray && !_hasHit)
+            {
+                StartCoroutine(DamagePlayer());
+                return;
+            }
+        
+            transform1.GetComponent<NavMeshAgent>().SetDestination(_playerTransform.position);
         }
-        catch (Exception)
+
+        private IEnumerator DamagePlayer()
         {
-            // ignored
+            _hasHit = true;
+
+            IDamageable damageable = _hit.transform.GetComponent<IDamageable>();
+            damageable?.Damage(damage);
+
+            yield return new WaitForSeconds(hitDelay);
+
+            _hasHit = false;
         }
-    }
-
-    private void Attack()
-    {
-        var transform1 = transform;
-        _ray = Physics.Raycast(transform1.position, transform1.forward, out _hit, hitDistance, playerMask);
-
-        if (_ray && !_hasHit)
-            StartCoroutine(DamagePlayer());
-    }
-
-    private IEnumerator DamagePlayer()
-    {
-        _hasHit = true;
-
-        IDamageable damageable = _hit.transform.GetComponent<IDamageable>();
-        damageable?.Damage(damage);
-
-        yield return new WaitForSeconds(hitDelay);
-
-        _hasHit = false;
     }
 }

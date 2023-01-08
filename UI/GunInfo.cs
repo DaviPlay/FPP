@@ -1,28 +1,42 @@
+using System;
+using Interfaces;
+using Player;
+using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
-public class GunInfo : MonoBehaviour
+namespace UI
 {
-    public Text gunName;
-    public Text maxAmmo;
-    public Text ammo;
-
-    private void Start()
+    public class GunInfo : MonoBehaviour
     {
-        Shooting.UpdateText += UpdateText;
-        IWeaponData weaponData = Shooting.GetData();
+        public TMP_Text gunName;
+        public TMP_Text magAmmo;
+        public TMP_Text ammo;
+        
+        private void Start()
+        {
+            Shooting.UpdateText += UpdateInfo;
 
-        gunName.text = weaponData.Name;
-        maxAmmo.text = weaponData.Ammo.ToString();
-        ammo.text = weaponData.MagAmmo.ToString();
-    }
+            try
+            {
+                IWeaponData weaponData = Shooting.GetData();
 
-    private void UpdateText()
-    {
-        IWeaponData weaponData = Shooting.GetData();
+                gunName.text = weaponData.Name;
+                magAmmo.text = weaponData.MagAmmo.ToString();
+                ammo.text = weaponData.Ammo.ToString();
+            }
+            catch (Exception)
+            {
+                // ignored
+            }
+        }
 
-        gunName.text = weaponData.Name;
-        maxAmmo.text = weaponData.Ammo.ToString();
-        ammo.text = weaponData.MagAmmo.ToString();
+        private void UpdateInfo()
+        {
+            IWeaponData weaponData = Shooting.GetData();
+
+            gunName.text = weaponData.Name;
+            magAmmo.text = weaponData.MagAmmo.ToString();
+            ammo.text = weaponData.Ammo.ToString();
+        }
     }
 }

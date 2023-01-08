@@ -1,4 +1,7 @@
-public interface IWeapon
+namespace Interfaces
 {
-    public IWeaponData GetData();
+    public interface IWeapon
+    {
+        public IWeaponData GetData();
+    }
 }

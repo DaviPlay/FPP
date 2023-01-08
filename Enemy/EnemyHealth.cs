@@ -1,40 +1,69 @@
 using System;
+using Interfaces;
+using Player;
 using UnityEngine;
 
-public class EnemyHealth : MonoBehaviour, IDamageable
+namespace Enemy
 {
-    private static float _maxHealth = 50;
-    private readonly HealthSystem _healthSystem = new(_maxHealth);
-
-    public static Action DamageEvent;
-    public static Action KillEvent;
-
-    public void Damage(float damage)
+    public class EnemyHealth : MonoBehaviour, IDamageable
     {
-        _healthSystem.Damage(damage);
-        DamageEvent?.Invoke();
+        [SerializeField] private float startingMaxHealth = 150;
+        public static float StartingHealth;
+        [SerializeField] private EnemyHealthBar healthBar;
+        private HealthSystem _healthSystem;
 
-        if (_healthSystem.Health == 0) Kill();
-    }
+        public static Action DamageEvent;
+        public static Action KillEvent;
 
-    private void Kill()
-    {
-        Destroy(gameObject);
-        KillEvent?.Invoke();
-    }
+        private void Start()
+        {
+            StartingHealth = startingMaxHealth;
+            
+            _healthSystem = new HealthSystem(startingMaxHealth);
+        }
 
-    public void SetMaxHealth(float healthMax)
-    {
-        _maxHealth = healthMax;
-    }
+        private void Heal(float heal)
+        {
+            _healthSystem.Heal(heal);
+            healthBar.SetValues(_healthSystem.Health);
+        }
+        
+        public void Damage(float damage)
+        {
+            _healthSystem.Damage(damage);
+            DamageEvent?.Invoke();
+            healthBar.SetValues(_healthSystem.Health);
 
-    public float GetMaxHealth()
-    {
-        return _healthSystem.HealthMax;
-    }
+            if (_healthSystem.Health == 0) Kill();
+        }
 
-    public float GetHealth()
-    {
-        return _healthSystem.Health;
+        private void Kill()
+        {
+            Destroy(gameObject);
+            KillEvent?.Invoke();
+        }
+
+        public void SetMaxHealth(float healthMax)
+        {
+            _healthSystem.HealthMax = healthMax;
+
+            healthBar.SetMaxValues(healthMax);
+        }
+
+        public float GetMaxHealth()
+        {
+            try
+            {
+                return _healthSystem.HealthMax;
+            }
+            catch (NullReferenceException)
+            {
+                
+            }
+
+            return startingMaxHealth;
+        }
+
+        public float GetHealth() => _healthSystem.Health;
     }
 }

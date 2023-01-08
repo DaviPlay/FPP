@@ -1,18 +1,23 @@
+using Enemy;
+using Player;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class PointsCounter : MonoBehaviour
+namespace UI
 {
-    [SerializeField] private Text points;
-
-    private void Start()
+    public class PointsCounter : MonoBehaviour
     {
-        EnemyHealth.DamageEvent += OnUpdateText;
-        EnemyHealth.KillEvent += OnUpdateText;
-        Shooting.UpdateText += OnUpdateText;
+        [SerializeField] private Text points;
 
-        points.text = PointManager.Points.ToString();
+        private void Start()
+        {
+            EnemyHealth.DamageEvent += OnUpdateText;
+            EnemyHealth.KillEvent += OnUpdateText;
+            Shooting.UpdateText += OnUpdateText;
+
+            points.text = PointManager.Points.ToString();
+        }
+
+        private void OnUpdateText() => points.text = PointManager.Points.ToString();
     }
-
-    private void OnUpdateText() => points.text = PointManager.Points.ToString();
 }

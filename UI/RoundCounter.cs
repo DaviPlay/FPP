@@ -1,14 +1,18 @@
+using Enemy;
+using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
-public class RoundCounter : MonoBehaviour
+namespace UI
 {
-    public Text round;
-
-    private void Start()
+    public class RoundCounter : MonoBehaviour
     {
-        EnemySpawn.RoundSwitch += UpdateText;
-    }
+        public TMP_Text round;
 
-    private void UpdateText() => round.text = (EnemySpawn.NextRound + 1).ToString();
+        private void Start()
+        {
+            EnemySpawn.RoundSwitch += UpdateText;
+        }
+
+        private void UpdateText() => round.text = (EnemySpawn.NextRound + 1).ToString();
+    }
 }

@@ -1,67 +1,77 @@
-using System.Collections;
+using Interfaces;
 using UnityEngine;
+using UnityEngine.Serialization;
 
-public class PlayerHealth : MonoBehaviour, IDamageable
+namespace Player
 {
-    private static float _maxHealth = 150;
-    private readonly HealthSystem _healthSystem = new(_maxHealth);
-    [SerializeField] private HealthBar healthBar;
-
-    [SerializeField] private float healthPerSecond;
-    [SerializeField] private float healthRegenDelay;
-    private float _timeSinceLastHit;
-    private bool _isRegenerating;
-
-    private Coroutine _regen;
-
-    private void Start() => _timeSinceLastHit = healthRegenDelay;
-
-    private void Update()
+    public class PlayerHealth : MonoBehaviour, IDamageable
     {
-        if (_timeSinceLastHit <= 0 && _healthSystem.Health < _healthSystem.HealthMax)
+
+        [SerializeField] private float maxHealth = 150;
+        [SerializeField] private float healthPerSecond;
+        [SerializeField] private float healthRegenDelay;
+        private float _timeSinceLastHit;
+        [HideInInspector] public bool isRegenerating;
+        
+        private HealthSystem _healthSystem;
+        [SerializeField] private HealthBar healthBar;
+
+        private Coroutine _regen;
+
+        private void Start()
         {
-            Regen();
+            _healthSystem = new HealthSystem(maxHealth);
+            
+            _timeSinceLastHit = healthRegenDelay;
         }
-        else
+
+        private void Update()
         {
-            _timeSinceLastHit -= Time.deltaTime;
-            _isRegenerating = false;
+            if (_timeSinceLastHit <= 0 && _healthSystem.Health < _healthSystem.HealthMax)
+            {
+                Regen();
+            }
+            else
+            {
+                _timeSinceLastHit -= Time.deltaTime;
+                isRegenerating = false;
 
-            if (_timeSinceLastHit < 0)
-                _timeSinceLastHit = 0;
+                if (_timeSinceLastHit < 0)
+                    _timeSinceLastHit = 0;
+            }
         }
-    }
 
-    public void Damage(float damage)
-    {
-        _healthSystem.Damage(damage);
-        _timeSinceLastHit = healthRegenDelay;
+        public void Damage(float damage)
+        {
+            _healthSystem.Damage(damage);
+            _timeSinceLastHit = healthRegenDelay;
 
-        healthBar.SetValues(_healthSystem.Health);
-    }
+            healthBar.SetValues(_healthSystem.Health);
+        }
+        
+        private void Heal(float heal)
+        {
+            _healthSystem.Heal(heal);
+            healthBar.SetValues(_healthSystem.Health);
+        }
+        
+        private void Regen()
+        {
+            isRegenerating = true;
 
-    private void Regen()
-    {
-        _isRegenerating = true;
+            _healthSystem.Health += healthPerSecond * Time.deltaTime;
+            healthBar.SetValues(_healthSystem.Health);
+        }
 
-        _healthSystem.Health += healthPerSecond * Time.deltaTime;
-        healthBar.SetValues(_healthSystem.Health);
-    }
+        public void SetMaxHealth(float healthMax)
+        {
+            maxHealth = healthMax;
 
-    public void SetMaxHealth(float healthMax)
-    {
-        _maxHealth = healthMax;
+            healthBar.SetMaxValues(healthMax);
+        }
 
-        healthBar.SetMaxValues(healthMax);
-    }
+        public float GetMaxHealth() => _healthSystem.HealthMax;
 
-    public float GetMaxHealth()
-    {
-        return _healthSystem.HealthMax;
-    }
-
-    public float GetHealth()
-    {
-        return _healthSystem.Health;
+        public float GetHealth() => _healthSystem.Health;
     }
 }

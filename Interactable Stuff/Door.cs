@@ -1,35 +1,41 @@
-﻿using UnityEngine;
+﻿using Interfaces;
+using Player;
+using Scriptable_Objects.Interactable_Objects;
+using UnityEngine;
 
-public class Door : MonoBehaviour, IInteractable
+namespace Interactable_Stuff
 {
-    [SerializeField] private DoorData data;
-
-    //REPLACE WITH ACTUAL ANIMATION YOU IDIOT
-    //(I'm not even gonna attempt to lerp it)
-    public void OnInteract(RaycastHit hit)
+    public class Door : MonoBehaviour, IInteractable
     {
-        if (data.Cost > PointManager.Points)
-            return;
+        [SerializeField] private DoorData data;
 
-        PointManager.Points -= data.Cost;
-        Shooting.UpdateText?.Invoke();
-        
-        Transform hinge = hit.transform.parent;
-        Vector3 rotation = hinge.rotation.eulerAngles;
-        
-        if (!data.IsOpen)
+        //REPLACE WITH ACTUAL ANIMATION YOU IDIOT
+        //(I'm not even gonna attempt to lerp it)
+        public void OnInteract(RaycastHit hit)
         {
-            hinge.rotation = Quaternion.Euler(rotation.x, rotation.y - 90, rotation.z);
+            if (data.Cost > PointManager.Points)
+                return;
+
+            PointManager.Points -= data.Cost;
+            Shooting.UpdateText?.Invoke();
+        
+            var hinge = hit.transform.parent;
+            var rotation = hinge.rotation.eulerAngles;
+        
+            if (!data.IsOpen)
+            {
+                hinge.rotation = Quaternion.Euler(rotation.x, rotation.y - 90, rotation.z);
             
-            data.IsOpen = true;
-        }
-        else
-        {
-            hinge.rotation = Quaternion.Euler(rotation.x, rotation.y + 90, rotation.z);
+                data.IsOpen = true;
+            }
+            else
+            {
+                hinge.rotation = Quaternion.Euler(rotation.x, rotation.y + 90, rotation.z);
             
-            data.IsOpen = false;
+                data.IsOpen = false;
+            }
         }
+
+        public IInteractableData GetData() => data;
     }
-
-    public IInteractableData GetData() => data;
 }

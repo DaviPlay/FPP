@@ -1,24 +1,28 @@
-﻿using UnityEngine;
+﻿using Interfaces;
+using UnityEngine;
 
-[CreateAssetMenu(fileName = "DoorData", menuName = "Interactable/Door")]
-public class DoorData : ScriptableObject, IInteractableData
+namespace Scriptable_Objects.Interactable_Objects
 {
-    [Header("Stats")] 
-    [SerializeField] private uint cost;
-    [Tooltip("In milliseconds")]
-    [SerializeField] private float timeToOpen;
-
-    public uint Cost
+    [CreateAssetMenu(fileName = "DoorData", menuName = "Interactable/Door")]
+    public class DoorData : ScriptableObject, IInteractableData
     {
-        get => cost;
-        set => cost = value;
-    }
+        [Header("Stats")] 
+        [SerializeField] private uint cost;
+        [Tooltip("In milliseconds")]
+        [SerializeField] private float timeToOpen;
+
+        public uint Cost
+        {
+            get => cost;
+            set => cost = value;
+        }
     
-    public float TimeToOpen
-    {
-        get => timeToOpen;
-        set => timeToOpen = value;
-    }
+        public float TimeToOpen
+        {
+            get => timeToOpen;
+            set => timeToOpen = value;
+        }
 
-    public bool IsOpen { get; set; }
+        public bool IsOpen { get; set; }
+    }
 }

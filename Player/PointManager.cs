@@ -1,22 +1,26 @@
+using Enemy;
 using UnityEngine;
 
-public class PointManager : MonoBehaviour
+namespace Player
 {
-    [Header("Point settings")]
-    [SerializeField] [Tooltip("Must be positive")] private uint startingPoints;
-    [SerializeField] [Tooltip("Must be positive")] private uint pointsOnDamage;
-    [SerializeField] [Tooltip("Must be positive")] private uint pointsOnKill;
-
-    public static uint Points { get; set; }
-
-    private void Start()
+    public class PointManager : MonoBehaviour
     {
-        EnemyHealth.DamageEvent += AddDamagePoints;
-        EnemyHealth.KillEvent += AddKillPoints;
+        [Header("Point settings")]
+        [SerializeField] [Tooltip("Must be positive")] private uint startingPoints;
+        [SerializeField] [Tooltip("Must be positive")] private uint pointsOnDamage;
+        [SerializeField] [Tooltip("Must be positive")] private uint pointsOnKill;
 
-        Points = startingPoints;
+        public static uint Points { get; set; }
+
+        private void Start()
+        {
+            EnemyHealth.DamageEvent += AddDamagePoints;
+            EnemyHealth.KillEvent += AddKillPoints;
+
+            Points = startingPoints;
+        }
+
+        private void AddDamagePoints() => Points += pointsOnDamage;
+        private void AddKillPoints() => Points += pointsOnKill;
     }
-
-    private void AddDamagePoints() => Points += pointsOnDamage;
-    private void AddKillPoints() => Points += pointsOnKill;
 }

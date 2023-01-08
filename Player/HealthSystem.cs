@@ -1,27 +1,30 @@
-public class HealthSystem
+namespace Player
 {
-    public float Health { get; set; }
-    public float HealthMin { get; set; }
-    public float HealthMax { get; set; }
-
-    public HealthSystem(float healthMax, float healthMin = 0)
+    public class HealthSystem
     {
-        Health = healthMax;
-        HealthMin = healthMin;
-        HealthMax = healthMax;
-    }
+        public float Health { get; set; }
+        public float HealthMin { get; set; }
+        public float HealthMax { get; set; }
 
-    public void Damage(float damage)
-    {
-        Health -= damage;
+        public HealthSystem(float healthMax, float healthMin = 0)
+        {
+            Health = healthMax;
+            HealthMin = healthMin;
+            HealthMax = healthMax;
+        }
 
-        if (Health < HealthMin) Health = HealthMin;
-    }
+        public void Damage(float damage)
+        {
+            Health -= damage;
 
-    public void Heal(float heal)
-    {
-        Health += heal;
+            if (Health < HealthMin) Health = HealthMin;
+        }
 
-        if (Health > HealthMax) Health = HealthMax;
+        public void Heal(float heal)
+        {
+            Health += heal;
+
+            if (Health > HealthMax) Health = HealthMax;
+        }
     }
 }
