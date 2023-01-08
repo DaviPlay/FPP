@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Reflection;
+using UnityEngine;
 
 namespace Gun_Stuff
 {
@@ -33,5 +35,27 @@ namespace Gun_Stuff
 
         private static MemberInfo ForValue(AmmoType at)
             => typeof(AmmoType).GetField(Enum.GetName(typeof(AmmoType), at));
+    }
+    
+    public class MyEnumFilterAttribute : PropertyAttribute
+    {
+        public int[] Values { get; set; }
+        public string[] Labels { get; set; }
+
+        public MyEnumFilterAttribute(params AmmoType[] ignoredValues)
+        {
+            var values = new List<int>((int[]) Enum.GetValues(typeof(AmmoType)));
+            var labels = new List<string>(Enum.GetNames(typeof(AmmoType)));
+ 
+            for (int i = ignoredValues.Length - 1 ; i >= 0 ; i--)
+            {
+                int index = values.IndexOf((int) ignoredValues[i]);
+                values.RemoveAt(index);
+                labels.RemoveAt(index);
+            }
+ 
+            Values = values.ToArray();
+            Labels = labels.ToArray();
+        }
     }
 }

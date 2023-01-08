@@ -11,14 +11,13 @@ namespace Player
         [SerializeField] private Transform shooter;
         private static Transform _sShooter;
         
-        private int _selectedWeapon;
+        private int _selectedWeapon = -1;
         private static IWeaponData _weaponData;
         [SerializeField] private ParticleSystem bloodEffect;
         public static ParticleSystem BloodParticles;
 
         public static Action SemiShootInput;
         public static Action AutoShootInput;
-        public static Action MeleeAttackInput;
         public static Action ReloadInput;
         public static Action InspectInput;
         public static Action WeaponSwitchInput;
@@ -31,11 +30,12 @@ namespace Player
             _sShooter = shooter;
             
             foreach (Transform gun in transform)
-                if (gun.gameObject.activeSelf)
-                {
-                    _weaponData = gun.GetComponent<IWeapon>().GetData();
-                    break;
-                }
+            {
+                _selectedWeapon++;
+                if (!gun.gameObject.activeSelf) continue;
+                _weaponData = gun.GetComponent<IWeapon>().GetData();
+                break;
+            }
 
             UpdateText?.Invoke();
         }
@@ -56,8 +56,6 @@ namespace Player
                             break;
                     }
                 }
-                else
-                    MeleeAttackInput?.Invoke();
 
             if (Input.GetButtonDown("Fire1"))
                 if (_weaponData is GunData)
@@ -73,8 +71,6 @@ namespace Player
                             break;
                     }
                 }
-                else
-                    MeleeAttackInput?.Invoke();
 
             if (Input.GetButtonDown("Reload"))
                 ReloadInput?.Invoke();
@@ -114,7 +110,7 @@ namespace Player
 
         private void SelectWeapon()
         {
-            var i = 0;
+            int i = 0;
             foreach (Transform gun in transform)
             {
                 if (i == _selectedWeapon)

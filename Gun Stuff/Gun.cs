@@ -16,8 +16,7 @@ namespace Gun_Stuff
         private LayerMask _enemyMask;
         private Transform _eyes;
 
-        [Header("Blood")]
-        [SerializeField] private float bloodDuration = 1;
+        [Header("Blood")] private const float BloodDuration = 1;
 
         private Animator _anim;
         private float _timeSinceLastShot;
@@ -33,11 +32,10 @@ namespace Gun_Stuff
         private static readonly int Inspected = Animator.StringToHash("Inspected");
 
         private bool CanShoot() => data.Reloading == false && data.MagAmmo > 0 && !MenuFunctions.IsGamePaused && 
-                                   gameObject.activeSelf && _timeSinceLastShot > 1 / (data.FireRate / 60) && data.Ammo > 0;
+                                   gameObject.activeSelf && _timeSinceLastShot > 1 / (data.FireRate / 60);
     
         private void Start()
         {
-            //Lol
             _shooter = Shooting.GetShooter();
         
             _enemyMask = LayerMask.GetMask("Enemy");
@@ -45,7 +43,7 @@ namespace Gun_Stuff
 
             data.Inspecting = false;
             data.Reloading = false;
-            data.Ammo = data.AmmoType.GetMaxAmmo();
+            data.Ammo = data._AmmoType.GetMaxAmmo();
             data.MagAmmo = data.MagSize;
 
             if (data.IsAuto)
@@ -86,11 +84,14 @@ namespace Gun_Stuff
                 damageable?.Damage(data.Damage);
 
                 ParticleSystem ps = Instantiate(Shooting.BloodParticles, hit.point, Quaternion.identity, hit.transform);
-                Destroy(ps, bloodDuration);
+                Destroy(ps, BloodDuration);
             }
-
-            data.MagAmmo--;
+            
             _timeSinceLastShot = 0;
+            
+            if (data._AmmoType == AmmoType.None) return;
+            
+            data.MagAmmo--;
             if (_anim != null)
                 _shoot = StartCoroutine(OnGunShot());
         }
@@ -106,7 +107,7 @@ namespace Gun_Stuff
 
         private void StartReload()
         {
-            if (MenuFunctions.IsGamePaused || !gameObject.activeSelf) return;
+            if (MenuFunctions.IsGamePaused || !gameObject.activeSelf || data._AmmoType == AmmoType.None) return;
             if (data.MagAmmo == data.MagSize) return;
 
             _reload = StartCoroutine(Reload());
@@ -145,8 +146,7 @@ namespace Gun_Stuff
 
         private void StartInspect()
         {
-            if (MenuFunctions.IsGamePaused) return;
-            if (!gameObject.activeSelf) return;
+            if (MenuFunctions.IsGamePaused || !gameObject.activeSelf) return;
 
             _inspect = StartCoroutine(Inspect());
         }

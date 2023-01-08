@@ -1,4 +1,5 @@
 using System;
+using Gun_Stuff;
 using Interfaces;
 using Player;
 using TMPro;
@@ -21,7 +22,7 @@ namespace UI
                 IWeaponData weaponData = Shooting.GetData();
 
                 gunName.text = weaponData.Name;
-                magAmmo.text = weaponData.MagAmmo.ToString();
+                magAmmo.text = weaponData.MagAmmo + "   /";
                 ammo.text = weaponData.Ammo.ToString();
             }
             catch (Exception)
@@ -34,9 +35,22 @@ namespace UI
         {
             IWeaponData weaponData = Shooting.GetData();
 
-            gunName.text = weaponData.Name;
-            magAmmo.text = weaponData.MagAmmo.ToString();
-            ammo.text = weaponData.Ammo.ToString();
+            if (weaponData._AmmoType == AmmoType.None)
+            {
+                magAmmo.gameObject.SetActive(false);
+                ammo.gameObject.SetActive(false);
+                
+                gunName.text = weaponData.Name;
+            }
+            else
+            {
+                magAmmo.gameObject.SetActive(true);
+                ammo.gameObject.SetActive(true);
+
+                gunName.text = weaponData.Name;
+                magAmmo.text =  weaponData.MagAmmo + "  /";
+                ammo.text = weaponData.Ammo.ToString();
+            }
         }
     }
 }

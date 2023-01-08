@@ -10,6 +10,6 @@ namespace Interfaces
         public uint MagSize { get; }
         public uint MagAmmo { get; set; }
         public uint Ammo { get; set; }
-        public AmmoType AmmoType { get; }
+        public AmmoType _AmmoType { get; }
     }
 }

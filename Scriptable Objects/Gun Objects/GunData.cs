@@ -1,3 +1,4 @@
+using EditorAttributes;
 using Gun_Stuff;
 using Interfaces;
 using UnityEngine;
@@ -10,16 +11,21 @@ namespace Scriptable_Objects.Gun_Objects
         [Header("Info")]
         [SerializeField] private new string name;
         [Tooltip("In percentage"), Range(0, 100)]
-        [SerializeField] private float weight;
+        [SerializeField] private float weight = 100;
 
         [Header("Shooting")]
         [SerializeField] private float damage;
         [SerializeField] private float maxDistance;
         [SerializeField] private bool isAuto;
-        [SerializeField] private uint magSize;
-        [SerializeField] private AmmoType ammoType;
         [Tooltip("Rounds Per Minute")] 
         [SerializeField] private float fireRate;
+        [SerializeField] private bool isMelee;
+        [ConditionalHide("isMelee", true, true)]
+        [MyEnumFilter(AmmoType.None)]
+        [SerializeField] private AmmoType ammoType;
+        [ConditionalHide("isMelee", true, true)]
+        [SerializeField] private uint magSize;
+        [ConditionalHide("isMelee", true, true)]
         [Tooltip("In Seconds")] 
         [SerializeField] private float reloadTime;
     
@@ -56,13 +62,13 @@ namespace Scriptable_Objects.Gun_Objects
         public bool Reloading { get; set; }
         public uint MagSize
         {
-            get => magSize;
+            get => isMelee ? 9999 : magSize;
             set => magSize = value;
         }
 
         public uint MagAmmo { get; set; }
         public uint Ammo { get; set; }
-        public AmmoType AmmoType => ammoType;
+        public AmmoType _AmmoType => isMelee ? AmmoType.None : ammoType;
 
         public float FireRate
         {

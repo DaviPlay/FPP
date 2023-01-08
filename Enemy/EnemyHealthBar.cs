@@ -14,7 +14,7 @@ namespace Enemy
         
         private void Start()
         {
-            _eyes= GameObject.FindWithTag("MainCamera").transform;
+            _eyes = GameObject.FindWithTag("MainCamera").transform;
             slider.minValue = 0;
             slider.maxValue = EnemyHealth.StartingHealth;
             slider.value = EnemyHealth.StartingHealth;
